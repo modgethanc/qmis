@@ -1,0 +1,13 @@
+QUARTER MASTER INVENTORY SYSTEM
+
+a json protocol
+
+status:
+  -circulation (available for checkout)
+  -surplus (not in normal circulation, but can be checked out)
+  -sick bay (in a repair process)
+  -scrap bin (in pieces, probably. also known as the shit bin)
+  -mia (we have no idea)
+  -deassessioned (lost, stolen, or thrown out. physically removed)
+
+category
