@@ -1,6 +1,7 @@
 QUARTER MASTER INVENTORY SYSTEM
+===============================
 
-a json protocol
+**a json protocol**
 
 status:
   -circulation (available for checkout)
@@ -10,4 +11,82 @@ status:
   -mia (we have no idea)
   -deassessioned (lost, stolen, or thrown out. physically removed)
 
-category
+category:
+  -camera body
+  -camera lens
+  -camera accessory
+  -tripod
+  -light meter
+  -misc camera accessory
+  -tool
+  -book
+  -outfit
+
+subcategory:
+  -35mm
+  -medium format
+  -large format
+  -digital
+
+location:
+  -equipment office
+  -faculty office
+  -quartermaster depot
+  -shooting studio
+  -darkroom
+  -digital lab
+
+last checked:
+  -yyyy-mm-dd
+
+make:
+  -primary manufacturer
+
+model:
+  -be as specific as possible!
+
+name:
+  -what a sane person would call it (not the nickname)
+
+---
+[specific meta data]
+
+quantity:
+  -integer count, for multiple generic
+
+focal length:
+  -for lenses
+
+aperture:
+  -for lenses
+
+mount:
+  -for lenses or bodies
+
+battery:
+  -for bodies or accessories
+
+filter size:
+  -for lenses
+
+---
+
+[agnostic meta data]
+
+serial number:
+  -manufacturer's serial number
+
+cmu id:
+  -cfaphoto-applied cmu non-capital sticker
+
+nickname:
+  -internal nickname for disambiguation
+
+entered:
+  -yyyy-mm-dd (acquisition date)
+
+provenance:
+  -acquisition source
+
+notes:
+  -known issues, mysteries, things to remember
