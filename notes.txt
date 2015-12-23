@@ -13,9 +13,6 @@ goals:
 ---
 [main categories]
 
-id:
-  -automatically generated number for each item
-
 status:
   -circulation (available for checkout)
   -surplus (not in normal circulation, but can be checked out)
@@ -65,7 +62,7 @@ name:
 [specific meta data]
 
 quantity:
-  -integer count, for multiple generic
+  -integer count, for generic, multiple items
 
 focal length:
   -for lenses
@@ -82,9 +79,27 @@ battery:
 filter size:
   -for lenses
 
+author:
+  -for books
+
+title:
+  -for books
+
+publisher:
+  -for books
+
+volume:
+  -for books/magazines
+
+isbn:
+  -for books
+
 ---
 
 [agnostic meta data]
+
+id:
+  -automatically generated internal number for each item
 
 serial number:
   -manufacturer's serial number
@@ -95,6 +110,9 @@ cmu id:
 nickname:
   -internal nickname for disambiguation
 
+number:
+  -integer identifier
+
 entered:
   -yyyy-mm-dd (acquisition date)
 
@@ -103,3 +121,6 @@ provenance:
 
 notes:
   -known issues, mysteries, things to remember
+
+links:
+  -list of ids this item is bundled with
