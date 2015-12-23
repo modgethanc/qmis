@@ -28,15 +28,20 @@ category:
   -tripod
   -light meter
   -misc camera accessory
+  -electronic device
   -tool
   -book
   -outfit
+  -timer
+  -darkroom accessory
+  -lighting accessory
 
 subcategory:
   -35mm
   -medium format
   -large format
   -digital
+  -enlarger
 
 location:
   -equipment office
@@ -45,6 +50,9 @@ location:
   -shooting studio
   -darkroom
   -digital lab
+  -hallway
+  -classroom
+  -service
 
 last checked:
   -yyyy-mm-dd
