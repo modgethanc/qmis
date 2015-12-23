@@ -5,13 +5,22 @@ QUARTER MASTER INVENTORY SYSTEM
 
 goals:
   -easy to add/update entries
-  -parse well into a web display
+  -parse into web display
+    -sortable by all sorts of categories
+      -'show all x'
+      -'list by x'
+  -parse into pdf
+  -parse into spreadsheet?
+  
   -inventory checking:
     -interface for checking off items
     -reminder to look in on things after more than 12 months
 
 ---
-[main categories]
+[main info]
+
+id:
+  -automatically generated internal number for each item
 
 status:
   -circulation (available for checkout)
@@ -28,6 +37,7 @@ category:
   -tripod
   -light meter
   -misc camera accessory
+  -lighting
   -electronic device
   -tool
   -book
@@ -35,6 +45,7 @@ category:
   -timer
   -darkroom accessory
   -lighting accessory
+  -misc
 
 subcategory:
   -35mm
@@ -106,9 +117,6 @@ isbn:
 
 [agnostic meta data]
 
-id:
-  -automatically generated internal number for each item
-
 serial number:
   -manufacturer's serial number
 
@@ -129,6 +137,9 @@ provenance:
 
 notes:
   -known issues, mysteries, things to remember
+
+manual:
+  -link to manual file or info page
 
 links:
   -list of ids this item is bundled with
