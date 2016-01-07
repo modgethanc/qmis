@@ -23,12 +23,12 @@ id:
   -automatically generated internal number for each item
 
 status:
-  -circulation (available for checkout)
-  -surplus (not in normal circulation, but can be checked out)
-  -sick bay (in a repair process)
-  -scrap bin (in pieces, probably. also known as the shit bin)
-  -mia (we have no idea)
-  -deassessioned (lost, stolen, or thrown out. physically removed)
+  -[circ] circulation (available for checkout)
+  -[surp] surplus (not in normal circulation, but can be checked out)
+  -[sick] sick bay (in a repair process)
+  -[scrap] scrap bin (in pieces, probably. also known as the shit bin)
+  -[mia] mia (we have no idea)
+  -[deac] deassessioned (lost, stolen, or thrown out. physically removed)
 
 category:
   -camera body
@@ -55,15 +55,15 @@ subcategory:
   -enlarger
 
 location:
-  -equipment office
-  -faculty office
-  -quartermaster depot
-  -shooting studio
-  -darkroom
-  -digital lab
-  -hallway
-  -classroom
-  -service
+  -[eqo] equipment office
+  -[fac] faculty office
+  -[qmd] quartermaster depot
+  -[ss] shooting studio
+  -[dark] darkroom
+  -[dig] digital lab
+  -[hall] hallway
+  -[class] classroom
+  -[out] service
 
 last checked:
   -yyyy-mm-dd
