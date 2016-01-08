@@ -19,15 +19,21 @@ def file_parse(filename):
 def open_file(filename):
     # opens filename.json file and returns dict (blank if no file)
 
-    if not os.path.isfile(file_parse(filename)):
+    if not os.path.isfile(filename):
         return {}
     else:
-        return json.load(open(file_parse(filename)))
+        return json.load(open(filename))
+
+#    if not os.path.isfile(file_parse(filename)):
+#        return {}
+#    else:
+#        return json.load(open(file_parse(filename)))
 
 def update_file(filename, j):
     # overwrites filename.json file with dict j
 
-    datafile = open(file_parse(filename), 'w')
+    datafile = open(filename, 'w')
+    #datafile = open(file_parse(filename), 'w')
     datafile.write(json.dumps(j, sort_keys=True, indent=2, separators=(',', ':')))
 
     #return j
@@ -124,7 +130,7 @@ def get_by_id(datafile, dataID):
 
 def find_all(datafile, key, value):
     # return a list of all ids that match the value of key in dict datafile
-    
+
     ids = get_all_ids(datafile)
     matches = []
 
