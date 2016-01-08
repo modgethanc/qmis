@@ -2,6 +2,7 @@
 
 import core
 
+import json
 import random
 import fileinput
 import os
@@ -14,20 +15,20 @@ files = []
 working = "" 
 workingdir = ""
 
-menuOptions = ["show current dataset", "load new dataset", "save current dataset", "quit"]
 
 #for x in fileinput.input():
 #    files.append(fileinput.filename())
 #    fileinput.nextfile()
 
-## setup
 
 def start():
     print(header)
     print("")
-    print(load_dir())
+    set_dir()
     print(main_menu())
     print(footer)
+
+## menus
 
 def end():
     print("")
@@ -36,21 +37,18 @@ def end():
 
     save_file()
 
-def load_dir():
+def set_dir():
     global workingdir
 
     print("set working directory: ", end="")
     workingdir = input()
 
     if not os.path.isdir(workingdir):
-        print("default directory does not exist. create it? [y/n]")
+        print("default directory does not exist. create it? [y/n] ", end="")
         if input() == "n":
-            print("bye")
-            return
+            return set_dir()
     else:
-        for x in os.listdir(workingdir):
-            if os.path.isfile(os.path.join(workingdir, x)):
-                files.append(x)
+        load_dir()
 
     return(workingdir)
 
@@ -73,6 +71,7 @@ def save_file():
     if choice == i:
         print("enter new filename: ", end="")
         save = input()
+        load_dir() # refresh file list!
     else:
         save = files[choice]
     
@@ -95,6 +94,8 @@ def choose_file():
     return (load(files[working]))
 
 def main_menu():
+    menuOptions = ["browse current dataset", "load new dataset", "save current dataset", "quit"]
+
     print("")
     print("GETTING THINGS DONE")
     print("-------------------")
@@ -109,8 +110,7 @@ def main_menu():
 
     if choice == "0":
         print("\n\n\n\n\n")
-        print("CURRENT DATASET:\b")
-        print(datafile)
+        print(data_menu())
     elif choice == "1":
         print("\n\n\n\n\n")
         print(choose_file())
@@ -120,19 +120,62 @@ def main_menu():
     elif choice == "3":
         print("\n\n\n\n\n")
         return end()
+    elif choice == 'q':
+        return "FIRING QUICK RELEASE"
     else:
         print("\nno idea what you mean; you gotta pick a number from the list!")
     
     return main_menu()
 
+def data_menu():
+    dataOptions = ["show raw data", "count items", "search", "back to main"]
+    print("")
+    print("DATA BROWSING")
+    print("-------------")
+
+    i = 0
+    for x in dataOptions:
+        print("\t[ "+str(i)+" ] "+x)
+        i += 1
+
+    print("\ntell me your desires: ", end="")
+    choice = input()
+    
+    if choice == "0":
+        print("\n\n\n\n\n")
+        print("CURRENT DATASET:\b")
+        print(pretty_data(datafile))
+    elif choice == "1":
+        print("\n\n\n\n\n")
+        print(count_data())
+    elif choice == "2":
+        print("\n\n\n\n\n")
+        print(search_data())
+    elif choice == "3":
+        return "\n\n\n\n\n"
+    else:
+        print("\nno idea what you mean; you gotta pick a number from the list!")
+
+    return data_menu()
+
+## setup
+
+def load_dir():
+    global files
+    files.clear()
+
+    for x in os.listdir(workingdir):
+        if os.path.isfile(os.path.join(workingdir, x)):
+            files.append(x)
+
 def load(filename):
     global datafile
 
-    datafile = core.open_file(filename)
+    datafile = core.open_file(os.path.join(workingdir,filename))
     return "loaded "+filename
 
 def write(filename):
-    core.update_file(filename, datafile)
+    core.update_file(os.path.join(workingdir, filename), datafile)
     return "updated "+filename
 
 ## retrieval
@@ -142,6 +185,31 @@ def random_item():
 
     ids = core.get_all_ids(datafile)
     return core.get_by_id(datafile, random.choice(ids))
+
+def pretty_data(data):
+    return json.dumps(data, sort_keys=True, indent=2, separators=(',',':'))
+
+def count_data():
+    print("COUNTING DATA")
+
+    statuses = core.get_all_statuses(datafile)
+    total = 0
+    for x in statuses:
+        count = len(core.get_all_status(datafile, x))
+        print(x+": "+str(count))
+        total += count
+
+    return "total: "+str(total)
+
+def search_data():
+    print("what's your search phrase? (i'm cap sensitive, sorry) ", end="")
+    value = input()
+    print("where do you want me to look for it? (still cap sensitive) ", end="")
+    key = input()
+    result = core.find_all(datafile, key, value)
+    for x in result:
+        print(pretty_data(core.get_by_id(datafile, x)))
+    return ""
 
 ## manipulation
 
