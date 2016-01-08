@@ -11,6 +11,8 @@ locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
 categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "camera accessory", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
 
+### basic data io
+
 def file_parse(filename):
     return "../data/"+filename+".json"
 
@@ -33,37 +35,74 @@ def update_file(filename, j):
 def new_entry(filename, status, info):
     # adds a new entry with dict info to dict made from filename.json
 
-
     j = open_file(filename)
 
-    #if status in j:
-    #    k = j[status]
-    #else:
-    #    k.update({status:""})
-
-    #k = get_all_status(filename, status)
     if not status in j:
         j.update({status:{}})
-
     k = j[status]
+
+    validate(info)
 
     newEntry = {str(util.genID(5)): info}
     k.update(newEntry)
-    print(j)
-    #j.update(k)
+    #print(j)
     update_file(filename, j)
 
     return j
 
-def get_all_status(filename, status):
-    # returns a dict of everything in filename.json of status
+### data manipulation
 
-    j = open_file(filename)
+def validate(data):
+    # checks dict data for required elements
 
-    if status in j:
-        return j[status]
+    if "date added" not in data:
+        data.update({"last added":time.time()})
+
+    return data
+
+def update_time(data):
+    # updates timestamp on a dict data
+    if "last updated" not in data:
+        data.update({"last updated":""})
+
+    data["last updated"] = time.time()
+    return data
+
+### data retrieval
+
+def get_all_status(datafile, status):
+    # returns a dict of everything in dict datafile of status
+
+    if status in datafile:
+        return datafile[status]
     else:
         return {}
+
+def get_all_statuses(datafile):
+    # returns a list of all statuses in dict datafile
+
+    return iter(datafile)
+
+def get_all_ids(filename, status=""):
+    # returns a list of all ids by status in filename.json
+
+    ids = []
+    datafile = open_file(filename)
+
+    if status:
+        for x in iter(get_all_status(datafile, status)):
+                ids.append(x)
+    else:
+        for x in get_all_statuses(datafile):
+            print(x)
+            for y in iter(get_all_status(datafile, x)):
+                ids.append(y)
+
+    return ids
+
+
+
+
 
 
 ## testing shit
