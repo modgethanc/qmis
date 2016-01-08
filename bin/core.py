@@ -6,44 +6,49 @@ import time
 
 import util
 
-def filename(status):
-    return "../data/"+status+".json"
+## CONSTANTS
+locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
+categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "camera accessory", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
+subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
 
-def openFile(status):
-    # opens status.json file and returns list (blank if no file)
+def file_parse(filename):
+    return "../data/"+filename+".json"
 
-    if not os.path.isfile(filename(status)):
-        return []
+def open_file(filename):
+    # opens filename.json file and returns dict (blank if no file)
+
+    if not os.path.isfile(file_parse(filename)):
+        return {}
     else:
-        return json.load(open(filename(status)))
+        return json.load(open(file_parse(filename)))
 
-def updateFile(status, j):
-    # overwrites status.json file with dict j
+def update_file(filename, j):
+    # overwrites filename.json file with dict j
 
-    datafile = open(filename(status), 'w')
+    datafile = open(file_parse(filename), 'w')
     datafile.write(json.dumps(j, sort_keys=True, indent=2, separators=(',', ':')))
 
-def newEntry(info, status="none"):
-    # adds a new entry with dict info to array made from status.json
+    #return j
+
+def new_entry(filename, status, info):
+    # adds a new entry with dict info to dict made from filename.json
 
     newEntry = {str(util.genID(5)): info}
 
-    j = openFile(status)
-    j.update(newEntry)
-    updateFile(status, j)
+    j = open_file(filename)
+    k = j[status]
+    k.update(newEntry)
+    j[status] = k
+    update_file(filename, j)
 
     return j
 
 ## testing shit
 
-print(openFile("test2"))
-print(len(openFile("test2")))
-#print(newEntry({"name":"oliver","loc":"eqo"},"test2"))
-
-info = { "loc": ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"],
-        "last updated": time.time(),
-        "cat":["camera body", "camera lens", "camera accessory", "tripod", "light meter", "camera accessory", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"],
-        "subcat":["35mm", "medium", "large", "digital", "enlarger"],
+sampleInfo = { "loc":locations,
+        "last updated":time.time(),
+        "cat":categories,
+        "subcat":subcategories,
         "make":"manufacturer",
         "model":"specific mode",
         "name":"common name",
@@ -57,6 +62,9 @@ info = { "loc": ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out
         "manual": "link to manual file or info page",
         "links": "list of ids this item is bundled with"}
 
-sample = {"sample":info}
+#fake = {"loc": "my butt"}
+#sample = {"none":{"sample":sampleInfo}}
 
-updateFile("sample", sample)
+#update_file("sample", sample)
+#print(open_file("sample"))
+#print(update_file("sample", new_entry("sample", "none", fake)))
