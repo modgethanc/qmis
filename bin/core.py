@@ -32,28 +32,29 @@ def update_file(filename, j):
 
     #return j
 
-def new_entry(filename, status, info):
-    # adds a new entry with dict info to dict made from filename.json
+def new_entry(datafile, status, data):
+    # creates a new entry in dict j with dict data to dict made from filename.json
 
-    j = open_file(filename)
+    #j = open_file(filename)
 
-    if not status in j:
-        j.update({status:{}})
-    k = j[status]
+    #if not status in j:
+    #    j.update({status:{}})
+    #k = j[status]
 
-    validate(info)
+    validate(data)
 
     itemID = str(util.genID(5))
-    while itemID in get_all_ids(j):
+    while itemID in get_all_ids(datafile):
         # check for id collisions
         itemID = str(util.genID(5))
 
-    newEntry = {itemID: info}
-    k.update(newEntry)
+    newEntry = {itemID: data}
+    #k.update(newEntry)
     #print(j)
-    update_file(filename, j)
+    #update_file(filename, j)
 
-    return j
+    #return j
+    return newEntry
 
 ### data manipulation
 
@@ -61,7 +62,7 @@ def validate(data):
     # checks dict data for required elements
 
     if "date added" not in data:
-        data.update({"last added":time.time()})
+        data.update({"date added":time.time()})
 
     return data
 
