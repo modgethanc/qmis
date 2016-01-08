@@ -33,15 +33,38 @@ def update_file(filename, j):
 def new_entry(filename, status, info):
     # adds a new entry with dict info to dict made from filename.json
 
-    newEntry = {str(util.genID(5)): info}
 
     j = open_file(filename)
+
+    #if status in j:
+    #    k = j[status]
+    #else:
+    #    k.update({status:""})
+
+    #k = get_all_status(filename, status)
+    if not status in j:
+        j.update({status:{}})
+
     k = j[status]
+
+    newEntry = {str(util.genID(5)): info}
     k.update(newEntry)
-    j[status] = k
+    print(j)
+    #j.update(k)
     update_file(filename, j)
 
     return j
+
+def get_all_status(filename, status):
+    # returns a dict of everything in filename.json of status
+
+    j = open_file(filename)
+
+    if status in j:
+        return j[status]
+    else:
+        return {}
+
 
 ## testing shit
 
