@@ -43,7 +43,12 @@ def new_entry(filename, status, info):
 
     validate(info)
 
-    newEntry = {str(util.genID(5)): info}
+    itemID = str(util.genID(5))
+    while itemID in get_all_ids(j):
+        # check for id collisions
+        itemID = str(util.genID(5))
+
+    newEntry = {itemID: info}
     k.update(newEntry)
     #print(j)
     update_file(filename, j)
@@ -83,24 +88,51 @@ def get_all_statuses(datafile):
 
     return iter(datafile)
 
-def get_all_ids(filename, status=""):
+def get_all_ids(datafile, status=""):
     # returns a list of all ids by status in filename.json
 
     ids = []
-    datafile = open_file(filename)
 
     if status:
         for x in iter(get_all_status(datafile, status)):
                 ids.append(x)
     else:
         for x in get_all_statuses(datafile):
-            print(x)
             for y in iter(get_all_status(datafile, x)):
                 ids.append(y)
 
     return ids
 
+def status_of_id(datafile, dataID):
+    status = ""
+    for x in get_all_statuses(datafile):
+        if dataID in get_all_ids(datafile, x):
+            return x
 
+    return status
+
+def get_by_id(datafile, dataID):
+    # return a dict of named dataID in dict datafile
+    item = {}
+    ids = get_all_ids(datafile)
+
+    if dataID in ids:
+        item = {dataID:datafile[status_of_id(datafile, dataID)][dataID]}
+
+    return item
+
+def find_all(datafile, key, value):
+    # return a list of all ids that match the value of key in dict datafile
+    
+    ids = get_all_ids(datafile)
+    matches = []
+
+    for x in ids:
+        item = get_by_id(datafile, x)
+        if item[x].get(key) == value:
+            matches.append(x)
+
+    return matches
 
 
 
