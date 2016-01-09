@@ -9,11 +9,15 @@ import os
 
 datafile = {}
 keys = []
+files = []
+working = ""
+workingdir = ""
+
 header = open("header.txt").read()
 footer = "\nsee you later, space cowboy..."
-files = []
-working = "" 
-workingdir = ""
+divider = "\n\n\n\n\n"
+invalid = "\nno idea what you mean; you gotta pick a number from the list!"
+quickrel = "firing quick release!"
 
 def start():
     print(header)
@@ -23,11 +27,11 @@ def start():
     print(footer)
 
 def end():
-    print("")
+    print(divider)
     print("WRAPPING IT UP")
-    print("!! always save your work! if you don't want to save your work, hit ctrl-c\n")
+    print("!! always save your work! if you don't want to save your work, hit 'q' to burn it all away\n")
 
-    save_file()
+    return save_file()
 
 def set_dir():
     global workingdir
@@ -46,6 +50,15 @@ def set_dir():
 
 ## menu handlers
 
+def print_menu(menu):
+    i = 0
+    for x in menu:
+        print("\t[ ", end="")
+        if i < 10:
+            print(" ", end="")
+        print(str(i)+" ] "+x)
+        i += 1
+
 def save_file():
     print("SAVING FILE")
     print("current file list:")
@@ -63,7 +76,7 @@ def save_file():
     save = ""
     choice = input()
     if choice =='q':
-        return "FIRING QUICK RELEASE"
+        return quickrel
 
     if int(choice) == i:
         print("enter new filename: ", end="")
@@ -73,30 +86,57 @@ def save_file():
         save = files[int(choice)]
 
     write(save)
-    return "\nsaved to "+save
+    return "\nsaved to "+save 
 
 def choose_file():
     global working
-    print("LOADING FILE")
+    print("\nLOADING FILE")
 
     print("i found these files: \n")
-    i = 0
-    for x in files:
-        print("\t[ "+str(i)+" ] "+x)
-        i += 1
+    print_menu(files)
 
     print("\npick one to load (q to cancel): ", end="")
     choice = input()
     if choice == "q":
-        return "FIRING QUICK RELEASE"
+        return quickrel
 
     working = int(choice)
 
     return (load(files[working]))
 
 def view_detail():
+    viewOptions = ["edit item", "stamp item", "link item", "unlink item", "change status", "change location"]
+
     print("single item ID: ", end="")
-    return single_item(input())
+    itemID = input()
+    print("")
+    print(single_item(itemID))
+
+    print("VIEWING DETAILS")
+    print_menu(viewOptions)
+
+    print("\ngonna do anything about it? (q to cancel) ", end="")
+
+    choice = input()
+
+    if choice == "0":
+        return edit_item(core.get_by_id(datafile, itemID)[itemID])
+    if choice == "1":
+        return
+    if choice == "2":
+        return
+    if choice == "3":
+        return
+    if choice == "4":
+        return
+    if choice == "5":
+        return
+    elif choice == "q":
+        return quickrel 
+    else:
+        print(invalid)
+
+    return view_detail()
 
 def search_data():
     print("what's your search phrase? (i'm cap sensitive, sorry) ", end="")
@@ -123,16 +163,22 @@ def short_data():
 
     return pretty_data(shortdata)
 
-def edit_item():
+def pick_item():
     print("EDITING AN ITEM")
     print("\ngive me an ID: ", end="")
-    item = input()
+    itemID = input()
 
-    raw = core.get_by_id(datafile, item)[item]
+    return edit_item(core.get_by_id(datafile, itemID)[itemID])
+
+def edit_item(raw):
     fields = []
+
     i = 0
     for x in iter(raw):
-        print("\t[ "+str(i)+" ] "+x+": "+str(raw.get(x)))
+        print("\t[ ", end="")
+        if i < 10:
+            print(" ", end="")
+        print(str(i)+" ] "+x+": "+str(raw.get(x)))
         i += 1
         fields.append(x)
 
@@ -140,26 +186,34 @@ def edit_item():
     choice = input()
 
     if choice =='q':
-        return "FIRING QUICK RELEASE"
+        return quickrel
 
     key = fields[int(choice)]
 
     if key == "cat":
-        j = 0
-        print("valid categories:")
-        for x in core.categories:
-            print("\t[ "+str(j)+" ] "+x)
-            j += 1
-        print("\npick one: ", end="")
-        value = core.categories[int(input())]
+        value = core.categories[int(pick_cat())]
+    elif key == "subcat":
+        value = core.subcategories[int(pick_subcat())]
     else:
         print("\t"+key+": ", end="")
         value = input()
 
     raw.update({key:value})
-    return pretty_data(raw)
+    return edit_item(raw)
 
 #def edit_handler():
+
+def pick_subcat():
+    print("valid subcategories:")
+    print_menu(core.subcategories)
+    print("\npick one: ", end="")
+    return input()
+
+def pick_cat():
+    print("valid categories:")
+    print_menu(core.categories)
+    print("\npick one: ", end="")
+    return input()
 
 ## menu views
 
@@ -170,30 +224,25 @@ def main_menu():
     print("GETTING THINGS DONE")
     print("-------------------")
 
-    i = 0
-    for x in menuOptions:
-        print("\t[ "+str(i)+" ] "+x)
-        i += 1
+    print_menu(menuOptions)
 
     print("\ntell me your desires: ", end="")
     choice = input()
 
     if choice == "0":
-        print("\n\n\n\n\n")
+        print(divider)
         print(data_menu())
     elif choice == "1":
-        print("\n\n\n\n\n")
         print(choose_file())
     elif choice == "2":
-        print("\n\n\n\n\n")
         print(save_file())
     elif choice == "3":
-        print("\n\n\n\n\n")
+        print(divider)
         return end()
     elif choice == 'q':
-        return "FIRING QUICK RELEASE"
+        return quickrel
     else:
-        print("\nno idea what you mean; you gotta pick a number from the list!")
+        print(invalid)
 
     return main_menu()
 
@@ -203,12 +252,9 @@ def data_menu():
     print("DATA BROWSING")
     print("-------------")
 
-    i = 0
-    for x in dataOptions:
-        print("\t[ "+str(i)+" ] "+x)
-        i += 1
+    print_menu(dataOptions)
 
-    print("\ntell me your desires: ", end="")
+    print("\ntell me your desires (q to cancel): ", end="")
     choice = input()
 
     if choice == "0":
@@ -217,23 +263,23 @@ def data_menu():
     elif choice == "1":
         print(short_data())
     elif choice == "2":
-        print("\n\n\n\n\n")
+        print(divider)
         print(view_detail())
     elif choice == "3":
-        print("\n\n\n\n\n")
+        print(divider)
         print(count_data())
     elif choice == "4":
-        print("\n\n\n\n\n")
+        print(divider)
         print(search_data())
     elif choice == "5":
-        print("\n\n\n\n\n")
-        print(edit_item())
+        print(divider)
+        print(pick_item())
     elif choice == "6":
-        return "\n\n\n\n\n"
+        return divider
     elif choice == 'q':
-        return "FIRING QUICK RELEASE"
+        return quickrel
     else:
-        print("\nno idea what you mean; you gotta pick a number from the list!")
+        print(invalid)
 
     return data_menu()
 
