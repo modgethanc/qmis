@@ -111,14 +111,7 @@ def search_data():
 def count_data():
     print("COUNTING DATA")
 
-    statuses = core.get_all_statuses(datafile)
-    total = 0
-    for x in statuses:
-        count = len(core.get_all_status(datafile, x))
-        print(x+": "+str(count))
-        total += count
-
-    return "total: "+str(total)
+    return "total: "+str(len(datafile))
 
 def short_data():
     ids = core.get_all_ids(datafile)
@@ -278,20 +271,18 @@ def single_item(item):
 
 ## manipulation
 
-def add_new(status, data):
-    if not status in datafile:
-        datafile.update({status:{}})
+def add_new(data):
+    # add new data to local datafile
 
-    k = datafile[status]
-    k.update(core.new_entry(datafile, status, data))
+    datafile.update(core.new_entry(datafile, data))
 
     return k
 
 def update_time(itemID):
-    # returns new dict of itemID with current timestamp
+    # update itemID with current timestamp
 
     item = core.update_time(core.get_by_id(datafile, itemID))
-    datafile[core.status_of_id(datafile, itemID)].update(item)
+    datafile.update(item)
 
 ## DO THE THING
 
