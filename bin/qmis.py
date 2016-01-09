@@ -59,7 +59,7 @@ def save_file():
         i += 1
     print("\t[ "+str(i)+" ] (other)")
 
-    print("\nwhere do you want to save? (q to cancel)", end="")
+    print("\nwhere do you want to save? (q to cancel) ", end="")
     save = ""
     choice = input()
     if choice =='q':
@@ -70,7 +70,7 @@ def save_file():
         save = input()
         load_dir() # refresh file list!
     else:
-        save = files[choice]
+        save = files[int(choice)]
 
     write(save)
     return "\nsaved to "+save
@@ -143,7 +143,7 @@ def edit_item():
         i += 1
         fields.append(x)
 
-    print("what do you want to edit? (q to cancel)", end="")
+    print("what do you want to edit? (q to cancel) ", end="")
     choice = input()
 
     if choice =='q':
@@ -151,11 +151,22 @@ def edit_item():
 
     key = fields[int(choice)]
 
-    print("\t"+key+": ", end="")
-    value = input()
+    if key == "cat":
+        j = 0
+        print("valid categories:")
+        for x in core.categories:
+            print("\t[ "+str(j)+" ] "+x)
+            j += 1
+        print("\npick one: ", end="")
+        value = core.categories[int(input())]
+    else:
+        print("\t"+key+": ", end="")
+        value = input()
 
     raw.update({key:value})
     return pretty_data(raw)
+
+#def edit_handler():
 
 ## menu views
 
