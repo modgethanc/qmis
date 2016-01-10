@@ -83,13 +83,31 @@ def link_together(datafile, source, target):
     # adds target id to source link list
 
     item = get_by_id(datafile, source)[source]
-    print(item)
     links = item.get("links")
     if links == '':
         links = []
 
     if target not in links:
         links.append(target)
+
+    item.update({"links":links})
+
+def unlink(datafile, target):
+    # remove target id from everything it's linked to
+    item = get_by_id(datafile, target)[target]
+    links = item.get("links")
+    
+    for x in links:
+        unlink_from(datafile, x, target)
+
+    item.update({"links":[]})
+
+def unlink_from(datafile, source, target):
+    # removes target id from source
+
+    item = get_by_id(datafile, source)[source]
+    links = item.get("links")
+    links.remove(target)
 
     item.update({"links":links})
 
