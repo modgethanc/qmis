@@ -69,8 +69,29 @@ def update_time(data):
 
 def link_ids(datafile, ids):
     # takes a list of ids from dict datafile and links them
-    return
+    if len(ids) < 2:
+        return
+    
+    for x in ids:
+        for y in ids:
+            if x != y:
+                link_together(datafile, x, y)
 
+    return ids
+
+def link_together(datafile, source, target):
+    # adds target id to source link list
+
+    item = get_by_id(datafile, source)[source]
+    print(item)
+    links = item.get("links")
+    if links == '':
+        links = []
+
+    if target not in links:
+        links.append(target)
+
+    item.update({"links":links})
 
 ### data retrieval
 
