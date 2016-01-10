@@ -314,12 +314,16 @@ def data_menu():
     return data_menu()
 
 def view_detail(itemID):
+    global longView
+
     viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location"]
 
 
     print(single_item(itemID))
     print("\nITEM DEETS")
     print_menu(viewOptions)
+    if not longView:
+        print("\n\t[  a ] (show full detail view)")
 
     print("\ngonna do anything about it? (q to cancel) ", end="")
 
@@ -339,6 +343,12 @@ def view_detail(itemID):
         print(change_loc(itemID))
     elif choice == "q":
         return quickrel 
+    elif choice == "a" and not longView:
+        longView = True
+        print("full deets")
+        print(single_item(itemID))
+        print("short deets")
+        longView = False 
     else:
         print(invalid)
 
@@ -418,8 +428,13 @@ def random_item():
 def pretty_data(data):
     return json.dumps(data, sort_keys=True, indent=2, separators=(',',':'))
 
-def single_item(item):
-    return pretty_data(core.get_by_id(datafile, item))
+def single_item(itemID):
+    if longView:
+        data = core.get_by_id(datafile, itemID)
+    else:
+        raw = core.get_by_id(datafile, itemID)[itemID]
+        data = {itemID:{"make":raw.get("make"), "model":raw.get("model")}}
+    return pretty_data(data)
 
 ## manipulation
 

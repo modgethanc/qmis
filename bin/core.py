@@ -14,9 +14,6 @@ statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
 
 ### basic data io
 
-def file_parse(filename):
-    return "../data/"+filename+".json"
-
 def open_file(filename):
     # opens filename.json file and returns dict (blank if no file)
 
