@@ -157,7 +157,7 @@ def short_data():
     return pretty_data(shortdata)
 
 def pick_item():
-    print("\ngive me an ID: (q to cancel) ", end="")
+    print("give me an ID: (q to cancel) ", end="")
     ans = input()
     ids = core.get_all_ids(datafile)
 
@@ -185,7 +185,25 @@ def stamp_item(itemID):
         return stamp_item(itemID)
 
 def link_item(itemID):
-    return
+    print("what do you want to link this to? ", end="")
+    target = pick_item()
+    print("ITEM ONE")
+    print(single_item(itemID))
+    print("ITEM TWO")
+    print(single_item(target))
+
+    print("are you suuuuure you want to link them? [y/n] ", end="")
+    choice = input()
+
+    if choice == "y":
+        print("link successful")
+        core.link_ids(datafile, [itemID, target])
+        return
+    elif choice == "n":
+        print("LINK ABORTED")
+        return
+    else:
+        return link_item(itemID)
 
 def unlink_item(itemID):
     return
