@@ -6,12 +6,14 @@ import json
 import random
 import fileinput
 import os
+import time
 
 datafile = {}
 keys = []
 files = []
 working = ""
 workingdir = ""
+longView = True
 
 header = open("header.txt").read()
 footer = "\nsee you later, space cowboy..."
@@ -28,7 +30,6 @@ def start():
 
 def end():
     print(divider)
-    print("WRAPPING IT UP")
     print("!! always save your work! if you don't want to save your work, hit 'q' to burn it all away\n")
 
     return save_file()
@@ -70,7 +71,7 @@ def save_file():
         else:
             print("")
         i += 1
-    print("\t[ "+str(i)+" ] (other)")
+    print("\t[ a ] (other)")
 
     print("\nwhere do you want to save? (q to cancel) ", end="")
     save = ""
@@ -78,7 +79,7 @@ def save_file():
     if choice =='q':
         return quickrel
 
-    if int(choice) == i:
+    if choice == "a":
         print("enter new filename: ", end="")
         save = input()
         load_dir() # refresh file list!
@@ -86,7 +87,7 @@ def save_file():
         save = files[int(choice)]
 
     write(save)
-    return "\nsaved to "+save 
+    return "\nsaved to "+save
 
 def choose_file():
     global working
@@ -104,40 +105,6 @@ def choose_file():
 
     return (load(files[working]))
 
-def view_detail():
-    viewOptions = ["edit item", "stamp item", "link item", "unlink item", "change status", "change location"]
-
-    print("single item ID: ", end="")
-    itemID = input()
-    print("")
-    print(single_item(itemID))
-
-    print("VIEWING DETAILS")
-    print_menu(viewOptions)
-
-    print("\ngonna do anything about it? (q to cancel) ", end="")
-
-    choice = input()
-
-    if choice == "0":
-        return edit_item(core.get_by_id(datafile, itemID)[itemID])
-    if choice == "1":
-        return
-    if choice == "2":
-        return
-    if choice == "3":
-        return
-    if choice == "4":
-        return
-    if choice == "5":
-        return
-    elif choice == "q":
-        return quickrel 
-    else:
-        print(invalid)
-
-    return view_detail()
-
 def search_data():
     print("what's your search phrase? (i'm cap sensitive, sorry) ", end="")
     value = input()
@@ -153,6 +120,32 @@ def count_data():
 
     return "total: "+str(len(datafile))
 
+def show_dataset():
+    print("\nCURRENT DATASET:\b")
+    if longView:
+        return pretty_data(datafile)
+    else:
+        return short_data()
+
+def toggle_view():
+    global longView
+
+    print("\nTOGGLE VIEW")
+    print("currently in ", end="")
+    if longView:
+        print("full data view. toggle to short view? [y/n] ", end="")
+    else:
+        print("short data view. toggle to full view? [y/n] ", end="")
+
+    choice = input()
+    if choice == "y":
+        longView = not longView
+        return "toggling view"
+    elif choice == "n":
+        return "not toggling view"
+    else:
+        return toggle_view()
+
 def short_data():
     ids = core.get_all_ids(datafile)
     shortdata = {}
@@ -164,55 +157,67 @@ def short_data():
     return pretty_data(shortdata)
 
 def pick_item():
-    print("EDITING AN ITEM")
-    print("\ngive me an ID: ", end="")
-    itemID = input()
+    print("\ngive me an ID: (q to cancel) ", end="")
+    ans = input()
+    ids = core.get_all_ids(datafile)
 
-    return edit_item(core.get_by_id(datafile, itemID)[itemID])
+    if ans in ids:
+        return ans
+    elif ans == "q":
+        return quickrel
+    else:
+        print("sorry, i didn't find that in the current dataset.")
+        return pick_item()
 
-def edit_item(raw):
-    fields = []
+def stamp_item(itemID):
+    print("\nSTAMP ITEM")
+    now = time.localtime
+    print("today is "+time.strftime("%d %B %Y")+". stamp this item with today? [y/n] ", end="")
 
-    i = 0
-    for x in iter(raw):
-        print("\t[ ", end="")
-        if i < 10:
-            print(" ", end="")
-        print(str(i)+" ] "+x+": "+str(raw.get(x)))
-        i += 1
-        fields.append(x)
-
-    print("what do you want to edit? (q to cancel) ", end="")
     choice = input()
 
-    if choice =='q':
-        return quickrel
-
-    key = fields[int(choice)]
-
-    if key == "cat":
-        value = core.categories[int(pick_cat())]
-    elif key == "subcat":
-        value = core.subcategories[int(pick_subcat())]
+    if choice == "y":
+        update_time(itemID)
+        return "roger! stamped that sucker"
+    elif choice == "n":
+        return "okay, not stamping a thing here"
     else:
-        print("\t"+key+": ", end="")
-        value = input()
+        return stamp_item(itemID)
 
-    raw.update({key:value})
-    return edit_item(raw)
+def link_item(itemID):
+    return
 
-#def edit_handler():
+def unlink_item(itemID):
+    return
+
+def change_status(itemID):
+    raw = core.get_by_id(datafile, itemID)[itemID]
+    raw.update({"status":core.status[int(pick_status())]})
+    return
+
+def change_loc(itemID):
+    raw = core.get_by_id(datafile, itemID)[itemID]
+    raw.update({"loc":core.locations[int(pick_loc())]})
+    return "location updated!"
 
 def pick_subcat():
-    print("valid subcategories:")
     print_menu(core.subcategories)
-    print("\npick one: ", end="")
+    print("\nset subcategory:", end="")
     return input()
 
 def pick_cat():
-    print("valid categories:")
     print_menu(core.categories)
-    print("\npick one: ", end="")
+    print("\nset category:", end="")
+    return input()
+
+def pick_loc():
+    print_menu(core.locations)
+    print("\nset location: ", end="")
+    return input()
+
+def pick_status():
+    print_menu(core.statuses)
+    print("\nset status: ", end="")
     return input()
 
 ## menu views
@@ -247,7 +252,7 @@ def main_menu():
     return main_menu()
 
 def data_menu():
-    dataOptions = ["show raw data", "short view", "view detail", "count items", "search", "edit item", "back to main"]
+    dataOptions = ["show dataset", "toggle view", "view detail", "count items", "search", "edit item", "back to main"]
     print("")
     print("DATA BROWSING")
     print("-------------")
@@ -258,13 +263,16 @@ def data_menu():
     choice = input()
 
     if choice == "0":
-        print("\nCURRENT DATASET:\b")
-        print(pretty_data(datafile))
+        print(show_dataset())
     elif choice == "1":
-        print(short_data())
+        print(toggle_view())
     elif choice == "2":
         print(divider)
-        print(view_detail())
+        itemID = pick_item()
+        if itemID == quickrel:
+            print(quickrel)
+        else:
+            print(view_detail(itemID))
     elif choice == "3":
         print(divider)
         print(count_data())
@@ -273,7 +281,11 @@ def data_menu():
         print(search_data())
     elif choice == "5":
         print(divider)
-        print(pick_item())
+        itemID = pick_item()
+        if itemID == quickrel:
+            print(quickrel)
+        else:
+            print(edit_item(itemID))
     elif choice == "6":
         return divider
     elif choice == 'q':
@@ -282,6 +294,82 @@ def data_menu():
         print(invalid)
 
     return data_menu()
+
+def view_detail(itemID):
+    viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location"]
+
+
+    print(single_item(itemID))
+    print("\nITEM DEETS")
+    print_menu(viewOptions)
+
+    print("\ngonna do anything about it? (q to cancel) ", end="")
+
+    choice = input()
+
+    if choice == "0":
+        print(edit_item(itemID))
+    elif choice == "1":
+        print(stamp_item(itemID))
+    elif choice == "2":
+        print(link_item(itemID))
+    elif choice == "3":
+        print(unlink_item(itemID))
+    elif choice == "4":
+        print(change_status(itemID))
+    elif choice == "5":
+        print(change_loc(itemID))
+    elif choice == "q":
+        return quickrel 
+    else:
+        print(invalid)
+
+    return view_detail(itemID)
+
+def edit_item(itemID):
+    raw = core.get_by_id(datafile, itemID)[itemID]
+    fields = []
+    
+    print("")
+    print(single_item(itemID))
+    print("\nEDITING DEETS")
+    i = 0
+    for x in iter(raw):
+        print("\t[ ", end="")
+        if i < 10:
+            print(" ", end="")
+        print(str(i)+" ] "+x+": "+str(raw.get(x)))
+        i += 1
+        fields.append(x)
+
+    print("\n\t[  a ] (add new field)")
+
+    print("what do you want to edit? (q to cancel) ", end="")
+    choice = input()
+
+    if choice =='q':
+        return quickrel
+
+    if choice == "a":
+        print("whatcha calling this new 'field'? ", end="")
+        key = input()
+    else:
+        key = fields[int(choice)]
+
+    if key == "cat":
+        value = core.categories[int(pick_cat())]
+    elif key == "subcat":
+        value = core.subcategories[int(pick_subcat())]
+    elif key == "loc":
+        value = core.locations[int(pick_loc())]
+    elif key == "status":
+        value = core.statuses[int(pick_status())]
+    else:
+        print("\t"+key+": ", end="")
+        value = input()
+
+    raw.update({key:value})
+    return edit_item(itemID)
 
 ## setup
 
@@ -327,7 +415,7 @@ def add_new(data):
 def update_time(itemID):
     # update itemID with current timestamp
 
-    item = core.update_time(core.get_by_id(datafile, itemID))
+    item = {itemID:core.update_time(core.get_by_id(datafile, itemID)[itemID])}
     datafile.update(item)
 
 ## DO THE THING

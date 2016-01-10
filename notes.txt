@@ -11,10 +11,14 @@ goals:
       -'list by x'
   -parse into pdf
   -parse into spreadsheet?
-  
+
   -inventory checking:
     -interface for checking off items
     -reminder to look in on things after more than 12 months
+
+FEATURE TDL:
+- bookmark (add an item to scratchpad; work with scratchpad)
+- serial editing (present a data set, go into edit menu for each one)
 
 ---
 [main info]

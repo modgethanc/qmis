@@ -10,6 +10,7 @@ import util
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
 categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "camera accessory", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
+statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
 
 ### basic data io
 
@@ -96,8 +97,8 @@ def find_all(datafile, key, value):
     matches = []
 
     for x in ids:
-        item = get_by_id(datafile, x)
-        if item[x].get(key) == value:
+        item = get_by_id(datafile, x)[x]
+        if item.get(key) == value:
             matches.append(x)
 
     return matches
