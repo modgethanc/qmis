@@ -218,6 +218,49 @@ def change_loc(itemID):
     raw.update({"loc":core.locations[int(pick_loc())]})
     return "location updated!"
 
+def enter_data(name):
+    print(name +": ", end="")
+    data = {name:input()}
+    return data
+
+def item_adder():
+    item = {}
+
+    print("ADDING NEW ITEM")
+    status = int(pick_status())
+    cat = int(pick_cat())
+    if cat <= 2:
+        subcat = int(pick_subcat())
+    else:
+        subcat = -1
+    loc = int(pick_loc())
+
+    for x in core.defaults:
+        item.update(enter_data(x))
+
+    if subcat == 1:
+        for x in core.lensdefaults:
+            item.update(enter_data(x))
+
+    if core.is_multiple(cat):
+        item.update(enter_data("number"))
+
+    item.update({"status":core.statuses[status]})
+    item.update({"cat":core.categories[cat]})
+    if subcat >= 0:
+        item.update({"subcat":core.subcategories[subcat]})
+    item.update({"loc":core.locations[loc]})
+    item.update({"links":[]})
+    print(pretty_data(item))
+    print("add this? [y/n] ", end="")
+
+    ans = input()
+    if ans == "y":
+        datafile.update(core.new_entry(datafile, item))
+        return("sweet! new toys.")
+    else:
+        return("chucking all that work out the window")
+
 def pick_subcat():
     print_menu(core.subcategories)
     print("\nset subcategory:", end="")
@@ -225,7 +268,7 @@ def pick_subcat():
 
 def pick_cat():
     print_menu(core.categories)
-    print("\nset category:", end="")
+    print("\nset category: ", end="")
     return input()
 
 def pick_loc():
@@ -270,7 +313,7 @@ def main_menu():
     return main_menu()
 
 def data_menu():
-    dataOptions = ["show dataset", "toggle view", "view detail", "count items", "search", "edit item", "back to main"]
+    dataOptions = ["show dataset", "toggle view", "view detail", "count items", "search", "edit item", "add item", "back to main"]
     print("")
     print("DATA BROWSING")
     print("-------------")
@@ -305,6 +348,8 @@ def data_menu():
         else:
             print(edit_item(itemID))
     elif choice == "6":
+        print(item_adder())
+    elif choice == "7":
         return divider
     elif choice == 'q':
         return quickrel

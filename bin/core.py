@@ -8,9 +8,12 @@ import util
 
 ## CONSTANTS
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
-categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "camera accessory", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
+categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
 statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
+defaults = ["make", "model", "name", "serial", "cmu", "provenance", "notes"]
+lensdefaults = ["focal length", "aperture", "mount"]
+multiples = [0, 3, 4, 10]
 
 ### basic data io
 
@@ -139,8 +142,8 @@ def find_all(datafile, key, value):
 
     return matches
 
-
-
+def is_multiple(cat):
+    return cat in multiples 
 
 ## testing shit
 
