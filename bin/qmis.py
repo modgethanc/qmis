@@ -9,11 +9,13 @@ import os
 import time
 
 datafile = {}
+lastSearch = {}
 keys = []
 files = []
 working = ""
 workingdir = ""
 longView = True
+auto = ""
 
 header = open("header.txt").read()
 footer = "\nsee you later, space cowboy..."
@@ -25,7 +27,11 @@ def start():
     print(header)
     print("")
     set_dir()
-    print(main_menu())
+    try:
+        print(main_menu())
+    except ValueError:
+        print("!!VOMIT!!\nthat was unexpected i'm starting over")
+        print(main_menu())
     print(footer)
 
 def end():
@@ -48,6 +54,12 @@ def set_dir():
         load_dir()
 
     return(workingdir)
+
+def autosave():
+    global auto
+    auto = files[int(working)]+".ats"
+    write(auto)
+    print("autosaved to "+auto)
 
 ## menu handlers
 
@@ -106,12 +118,13 @@ def choose_file():
     return (load(files[working]))
 
 def search_data():
+    global lastSearch
     print("what's your search phrase? (i'm cap sensitive, sorry) ", end="")
     value = input()
     print("where do you want me to look for it? (still cap sensitive) ", end="")
     key = input()
-    result = core.find_all(datafile, key, value)
-    for x in result:
+    lastSearch = core.find_all(datafile, key, value)
+    for x in lastSearch:
         print(pretty_data(core.get_by_id(datafile, x)))
     return ""
 
@@ -120,12 +133,11 @@ def count_data():
 
     return "total: "+str(len(datafile))
 
-def show_dataset():
-    print("\nCURRENT DATASET:\b")
+def show_dataset(data):
     if longView:
-        return pretty_data(datafile)
+        return pretty_data(data)
     else:
-        return short_data()
+        return short_data(data)
 
 def toggle_view():
     global longView
@@ -146,12 +158,12 @@ def toggle_view():
     else:
         return toggle_view()
 
-def short_data():
-    ids = core.get_all_ids(datafile)
+def short_data(data):
+    ids = core.get_all_ids(data)
     shortdata = {}
     for x in ids:
         raw = core.get_by_id(datafile, x)[x]
-        item = {x:{"make":raw.get("make"), "model":raw.get("model")}}
+        item = {x:{"make":raw.get("make"), "model":raw.get("model"), "name":raw.get("name"), "nick":raw.get("nick")}}
         shortdata.update(item)
 
     return pretty_data(shortdata)
@@ -177,8 +189,10 @@ def stamp_item(itemID):
     choice = input()
 
     if choice == "y":
-        update_time(itemID)
-        return "roger! stamped that sucker"
+        links = core.get_by_id(datafile, itemID).get(itemID).get("links")
+        for x in links:
+            update_time(x)
+        return "roger! stamped that sucker and everything attached to it"
     elif choice == "n":
         return "okay, not stamping a thing here"
     else:
@@ -187,17 +201,27 @@ def stamp_item(itemID):
 def link_item(itemID):
     print("what do you want to link this to? ", end="")
     target = pick_item()
-    print("ITEM ONE")
-    print(single_item(itemID))
-    print("ITEM TWO")
-    print(single_item(target))
+    links = [itemID, target]
+    for x in links:
+        item = core.get_by_id(datafile, x)
+        check = item.get(x).get("links")
+        for y in check:
+            if y not in links:
+                links.append(y)
+    for x in links:
+        print(single_item(x))
+
+    #print("ITEM ONE")
+    #print(single_item(itemID))
+    #print("ITEM TWO")
+    #print(single_item(target))
 
     print("are you suuuuure you want to link them? [y/n] ", end="")
     choice = input()
 
     if choice == "y":
+        core.link_ids(datafile, links)
         print("link successful")
-        core.link_ids(datafile, [itemID, target])
         return
     elif choice == "n":
         print("LINK ABORTED")
@@ -238,7 +262,7 @@ def item_adder():
     for x in core.defaults:
         item.update(enter_data(x))
 
-    if subcat == 1:
+    if cat == 1:
         for x in core.lensdefaults:
             item.update(enter_data(x))
 
@@ -256,14 +280,16 @@ def item_adder():
 
     ans = input()
     if ans == "y":
-        datafile.update(core.new_entry(datafile, item))
+        new = core.new_entry(datafile, item)
+        datafile.update(new)
+        print(short_data(new))
         return("sweet! new toys.")
     else:
         return("chucking all that work out the window")
 
 def pick_subcat():
     print_menu(core.subcategories)
-    print("\nset subcategory:", end="")
+    print("\nset subcategory: ", end="")
     return input()
 
 def pick_cat():
@@ -313,7 +339,7 @@ def main_menu():
     return main_menu()
 
 def data_menu():
-    dataOptions = ["show dataset", "toggle view", "view detail", "count items", "search", "edit item", "add item", "back to main"]
+    dataOptions = ["show dataset", "show last search", "toggle view", "view detail", "count items", "search", "edit item", "add item", "back to main"]
     print("")
     print("DATA BROWSING")
     print("-------------")
@@ -324,32 +350,34 @@ def data_menu():
     choice = input()
 
     if choice == "0":
-        print(show_dataset())
-    elif choice == "1":
-        print(toggle_view())
+        print(show_dataset(datafile))
+    if choice == "1":
+        print(show_dataset(lastSearch))
     elif choice == "2":
+        print(toggle_view())
+    elif choice == "3":
         print(divider)
         itemID = pick_item()
         if itemID == quickrel:
             print(quickrel)
         else:
             print(view_detail(itemID))
-    elif choice == "3":
-        print(divider)
-        print(count_data())
     elif choice == "4":
         print(divider)
-        print(search_data())
+        print(count_data())
     elif choice == "5":
+        print(divider)
+        print(search_data())
+    elif choice == "6":
         print(divider)
         itemID = pick_item()
         if itemID == quickrel:
             print(quickrel)
         else:
             print(edit_item(itemID))
-    elif choice == "6":
-        print(item_adder())
     elif choice == "7":
+        print(item_adder())
+    elif choice == "8":
         return divider
     elif choice == 'q':
         return quickrel
@@ -397,6 +425,7 @@ def view_detail(itemID):
     else:
         print(invalid)
 
+    autosave()
     return view_detail(itemID)
 
 def edit_item(itemID):
@@ -493,7 +522,7 @@ def add_new(data):
 def update_time(itemID):
     # update itemID with current timestamp
 
-    item = {itemID:core.update_time(core.get_by_id(datafile, itemID)[itemID])}
+    item = {itemID:core.update_time(core.get_by_id(datafile, itemID).get(itemID))}
     datafile.update(item)
 
 ## DO THE THING

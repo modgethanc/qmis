@@ -11,7 +11,7 @@ locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
 categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
 statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
-defaults = ["make", "model", "name", "serial", "cmu", "provenance", "notes"]
+defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
 lensdefaults = ["focal length", "aperture", "mount"]
 multiples = [0, 3, 4, 10]
 
