@@ -32,6 +32,9 @@ def start():
     except ValueError:
         print("!!VOMIT!!\nthat was unexpected i'm starting over")
         print(main_menu())
+    except KeyboardInterrupt:
+        print("?PANIC?")
+        print(main_menu())
     print(footer)
 
 def end():
@@ -119,10 +122,16 @@ def choose_file():
 
 def search_data():
     global lastSearch
-    print("what's your search phrase? (i'm cap sensitive, sorry) ", end="")
-    value = input()
-    print("where do you want me to look for it? (still cap sensitive) ", end="")
+
+    print("SEARCH FILTERS")`
+
+    search = {}
+    search = basic_settings(search)
+
+    print("other field? (i'm cap sensitive sorry) ", end="")
     key = input()
+    print("what's your search phrase? (still cap sensitive, sorry) ", end="")
+    value = input()
     lastSearch = core.find_all(datafile, key, value)
     for x in lastSearch:
         print(pretty_data(core.get_by_id(datafile, x)))
@@ -189,7 +198,9 @@ def stamp_item(itemID):
     choice = input()
 
     if choice == "y":
-        links = core.get_by_id(datafile, itemID).get(itemID).get("links")
+        links = get_links(itemID)
+        #links = core.get_by_id(datafile, itemID).get(itemID).get("links")
+        #links.append(itemID)
         for x in links:
             update_time(x)
         return "roger! stamped that sucker and everything attached to it"
@@ -233,13 +244,21 @@ def unlink_item(itemID):
     return
 
 def change_status(itemID):
-    raw = core.get_by_id(datafile, itemID)[itemID]
-    raw.update({"status":core.status[int(pick_status())]})
-    return
+    #raw = core.get_by_id(datafile, itemID)[itemID]
+    statuscode = int(pick_status())
+    links = get_links(itemID)
+    for x in links:
+        raw = core.get_by_id(datafile, x)[x]
+        raw.update({"status":core.statuses[statuscode]})
+    return "status updated!"
 
 def change_loc(itemID):
-    raw = core.get_by_id(datafile, itemID)[itemID]
-    raw.update({"loc":core.locations[int(pick_loc())]})
+    #raw = core.get_by_id(datafile, itemID)[itemID]
+    loccode = int(pick_loc())
+    links = get_links(itemID)
+    for x in links:
+        raw = core.get_by_id(datafile, x)[x]
+        raw.update({"loc":core.locations[loccode]})
     return "location updated!"
 
 def enter_data(name):
@@ -248,15 +267,18 @@ def enter_data(name):
     return data
 
 def item_adder():
-    item = {}
 
     print("ADDING NEW ITEM")
+
+    item = {}
+    item = basic_settings(item)
     status = int(pick_status())
     cat = int(pick_cat())
     if cat <= 2:
         subcat = int(pick_subcat())
     else:
         subcat = -1
+
     loc = int(pick_loc())
 
     for x in core.defaults:
@@ -268,12 +290,14 @@ def item_adder():
 
     if core.is_multiple(cat):
         item.update(enter_data("number"))
-
-    item.update({"status":core.statuses[status]})
-    item.update({"cat":core.categories[cat]})
-    if subcat >= 0:
+    if status != len(core.statuses):
+        item.update({"status":core.statuses[status]})
+    if cat != len(core.categories):
+        item.update({"cat":core.categories[cat]})
+    if subcat >= 0 and subcat != len(core.subcategories):
         item.update({"subcat":core.subcategories[subcat]})
-    item.update({"loc":core.locations[loc]})
+    if loc != len(core.locations):
+        item.update({"loc":core.locations[loc]})
     item.update({"links":[]})
     print(pretty_data(item))
     print("add this? [y/n] ", end="")
@@ -289,21 +313,25 @@ def item_adder():
 
 def pick_subcat():
     print_menu(core.subcategories)
+    print("\n\t[  "+str(len(core.subcategories))+" ] (none)")
     print("\nset subcategory: ", end="")
     return input()
 
 def pick_cat():
     print_menu(core.categories)
+    print("\n\t[ "+str(len(core.categories))+" ] (none)")
     print("\nset category: ", end="")
     return input()
 
 def pick_loc():
     print_menu(core.locations)
+    print("\n\t[  "+str(len(core.locations))+" ] (none)")
     print("\nset location: ", end="")
     return input()
 
 def pick_status():
     print_menu(core.statuses)
+    print("\n\t[  "+str(len(core.statuses))+" ] (none)")
     print("\nset status: ", end="")
     return input()
 
@@ -351,7 +379,7 @@ def data_menu():
 
     if choice == "0":
         print(show_dataset(datafile))
-    if choice == "1":
+    elif choice == "1":
         print(show_dataset(lastSearch))
     elif choice == "2":
         print(toggle_view())
@@ -392,7 +420,12 @@ def view_detail(itemID):
     viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location"]
 
 
-    print(single_item(itemID))
+    if len(get_links(itemID)) > 1:
+        for x in get_links(itemID):
+            print(single_item(x))
+    else:
+        print(single_item(itemID))
+
     print("\nITEM DEETS")
     print_menu(viewOptions)
     if not longView:
@@ -510,6 +543,12 @@ def single_item(itemID):
         data = {itemID:{"make":raw.get("make"), "model":raw.get("model")}}
     return pretty_data(data)
 
+def get_links(itemID):
+    links = []
+    links.extend(core.get_by_id(datafile, itemID).get(itemID).get("links"))
+    links.append(itemID)
+    return links
+
 ## manipulation
 
 def add_new(data):
@@ -522,8 +561,31 @@ def add_new(data):
 def update_time(itemID):
     # update itemID with current timestamp
 
+    print("stamping "+itemID)
     item = {itemID:core.update_time(core.get_by_id(datafile, itemID).get(itemID))}
     datafile.update(item)
+
+def basic_settings(item):
+    # runs down basic shit for dict item
+
+    status = int(pick_status())
+    cat = int(pick_cat())
+    if cat <= 2:
+        subcat = int(pick_subcat())
+    else:
+        subcat = -1
+    loc = int(pick_loc())
+
+    if status != len(core.statuses):
+        item.update({"status":core.statuses[status]})
+    if cat != len(core.categories):
+        item.update({"cat":core.categories[cat]})
+    if subcat >= 0 and subcat != len(core.subcategories):
+        item.update({"subcat":core.subcategories[subcat]})
+    if loc != len(core.locations):
+        item.update({"loc":core.locations[loc]})
+
+    return item
 
 ## DO THE THING
 

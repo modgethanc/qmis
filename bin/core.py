@@ -9,7 +9,7 @@ import util
 ## CONSTANTS
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
 categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
-subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
+subcategories = ["35mm", "medium", "large", "digital", "enlarger"]
 statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
 defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
 lensdefaults = ["focal length", "aperture", "mount"]
@@ -64,6 +64,7 @@ def update_time(data):
         data.update({"last updated":""})
 
     data["last updated"] = time.time()
+    print("core: " + json.dumps(data))
 
     return data
 
@@ -128,6 +129,28 @@ def get_by_id(datafile, dataID):
         item = {dataID:datafile[dataID]}
 
     return item
+
+def multisearch(datafile, searchdict):
+    # returns a list of all ids that satisfy search terms in the searchdict
+
+    ids = get_all_ids(datafile)
+    matches = []
+    fields = iter(searchdict)
+
+    for x in ids:
+        found = False
+        item = get_by_id(datafile, x)[x]
+        for y in fields:
+            if item.get(y) == searchdict.get(y):
+                found = True
+            else:
+                found = False
+                continue
+
+        if found:
+            matches.append(x)
+
+    return matches
 
 def find_all(datafile, key, value):
     # return a list of all ids that match the value of key in dict datafile
