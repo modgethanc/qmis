@@ -67,6 +67,7 @@ def autosave():
 ## menu handlers
 
 def print_menu(menu):
+    print("OPTIONS!")
     i = 0
     for x in menu:
         print("\t[ ", end="")

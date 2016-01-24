@@ -21,6 +21,8 @@ FEATURE TDL:
 - serial editing (present a data set, go into edit menu for each one)
 - importing aid: show random item to update
 
+- MAKE MULTISEARCH HAVE BLANK OPTIONS
+
 ---
 [main info]
 
