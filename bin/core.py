@@ -13,7 +13,7 @@ subcategories = ["35mm", "medium", "large", "digital", "enlarger"]
 statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
 defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
 lensdefaults = ["focal length", "aperture", "mount"]
-multiples = [0, 3, 4, 10]
+multiples = [categories[0], categories[3], categories[4], categories[10]]
 
 ### basic data io
 
@@ -140,14 +140,19 @@ def multisearch(datafile, searchdict):
     for x in ids:
         found = False
         item = get_by_id(datafile, x)[x]
-        for y in fields:
+
+        for y in iter(searchdict):
+            #print(item)
+            #print("searching for "+y+":"+searchdict.get(y))
+            print(item.get(y))
             if item.get(y) == searchdict.get(y):
                 found = True
             else:
                 found = False
-                continue
+                break 
 
         if found:
+            #print("FOUND "+x)
             matches.append(x)
 
     return matches
@@ -165,8 +170,8 @@ def find_all(datafile, key, value):
 
     return matches
 
-def is_multiple(cat):
-    return cat in multiples 
+def is_multiple(item):
+    return item.get("cat") in multiples 
 
 ## testing shit
 

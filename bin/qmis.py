@@ -123,7 +123,7 @@ def choose_file():
 def search_data():
     global lastSearch
 
-    print("SEARCH FILTERS")`
+    print("SEARCH FILTERS")
 
     search = {}
     search = basic_settings(search)
@@ -132,7 +132,10 @@ def search_data():
     key = input()
     print("what's your search phrase? (still cap sensitive, sorry) ", end="")
     value = input()
-    lastSearch = core.find_all(datafile, key, value)
+
+    search.update({key:value})
+    lastSearch = core.multisearch(datafile, search)
+    #lastSearch = core.find_all(datafile, key, value)
     for x in lastSearch:
         print(pretty_data(core.get_by_id(datafile, x)))
     return ""
@@ -272,32 +275,17 @@ def item_adder():
 
     item = {}
     item = basic_settings(item)
-    status = int(pick_status())
-    cat = int(pick_cat())
-    if cat <= 2:
-        subcat = int(pick_subcat())
-    else:
-        subcat = -1
-
-    loc = int(pick_loc())
 
     for x in core.defaults:
         item.update(enter_data(x))
 
-    if cat == 1:
+    if item.get("cat") == core.categories[1]:
         for x in core.lensdefaults:
             item.update(enter_data(x))
 
-    if core.is_multiple(cat):
+    if core.is_multiple(item):
         item.update(enter_data("number"))
-    if status != len(core.statuses):
-        item.update({"status":core.statuses[status]})
-    if cat != len(core.categories):
-        item.update({"cat":core.categories[cat]})
-    if subcat >= 0 and subcat != len(core.subcategories):
-        item.update({"subcat":core.subcategories[subcat]})
-    if loc != len(core.locations):
-        item.update({"loc":core.locations[loc]})
+
     item.update({"links":[]})
     print(pretty_data(item))
     print("add this? [y/n] ", end="")
@@ -380,7 +368,9 @@ def data_menu():
     if choice == "0":
         print(show_dataset(datafile))
     elif choice == "1":
-        print(show_dataset(lastSearch))
+        #print(show_dataset(lastSearch))
+        for x in lastSearch:
+            print(pretty_data(core.get_by_id(datafile, x)))
     elif choice == "2":
         print(toggle_view())
     elif choice == "3":
@@ -569,11 +559,15 @@ def basic_settings(item):
     # runs down basic shit for dict item
 
     status = int(pick_status())
+    print(divider)
     cat = int(pick_cat())
+    print(divider)
     if cat <= 2:
+        print(divider)
         subcat = int(pick_subcat())
     else:
         subcat = -1
+    print(divider)
     loc = int(pick_loc())
 
     if status != len(core.statuses):
