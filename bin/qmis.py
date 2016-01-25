@@ -9,7 +9,8 @@ import os
 import time
 
 datafile = {}
-lastSearch = {}
+lastSearch = []
+scratch = []
 keys = []
 files = []
 working = ""
@@ -129,12 +130,14 @@ def search_data():
     search = {}
     search = basic_settings(search)
 
-    print("other field? (i'm cap sensitive sorry) ", end="")
+    print("other field? (i'm cap sensitive sorry. leave blank to cancel) ", end="")
     key = input()
-    print("what's your search phrase? (still cap sensitive, sorry) ", end="")
-    value = input()
+    if key:
+        print("what's your search phrase? (still cap sensitive, sorry) ", end="")
+        value = input()
 
-    search.update({key:value})
+        search.update({key:value})
+
     lastSearch = core.multisearch(datafile, search)
     #lastSearch = core.find_all(datafile, key, value)
     for x in lastSearch:
@@ -193,6 +196,10 @@ def pick_item():
     else:
         print("sorry, i didn't find that in the current dataset.")
         return pick_item()
+
+def bookmark(itemID):
+    scratch.append(itemID)
+    return "added to scratchpad"
 
 def stamp_item(itemID):
     print("\nSTAMP ITEM")
@@ -356,7 +363,9 @@ def main_menu():
     return main_menu()
 
 def data_menu():
-    dataOptions = ["show dataset", "show last search", "toggle view", "view detail", "count items", "search", "edit item", "add item", "back to main"]
+    global scratch
+
+    dataOptions = ["show dataset", "show scratchpad", "clear scratchpad","show last search", "toggle view", "view detail", "count items", "search", "edit item", "add item", "back to main"]
     print("")
     print("DATA BROWSING")
     print("-------------")
@@ -369,34 +378,39 @@ def data_menu():
     if choice == "0":
         print(show_dataset(datafile))
     elif choice == "1":
+        for x in scratch:
+            print(pretty_data(core.get_by_id(datafile, x)))
+    elif choice == "2":
+        scratch = []
+    elif choice == "3":
         #print(show_dataset(lastSearch))
         for x in lastSearch:
             print(pretty_data(core.get_by_id(datafile, x)))
-    elif choice == "2":
+    elif choice == "4":
         print(toggle_view())
-    elif choice == "3":
+    elif choice == "5":
         print(divider)
         itemID = pick_item()
         if itemID == quickrel:
             print(quickrel)
         else:
             print(view_detail(itemID))
-    elif choice == "4":
+    elif choice == "6":
         print(divider)
         print(count_data())
-    elif choice == "5":
+    elif choice == "7":
         print(divider)
         print(search_data())
-    elif choice == "6":
+    elif choice == "8":
         print(divider)
         itemID = pick_item()
         if itemID == quickrel:
             print(quickrel)
         else:
             print(edit_item(itemID))
-    elif choice == "7":
+    elif choice == "9":
         print(item_adder())
-    elif choice == "8":
+    elif choice == "10":
         return divider
     elif choice == 'q':
         return quickrel
@@ -408,7 +422,7 @@ def data_menu():
 def view_detail(itemID):
     global longView
 
-    viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location"]
+    viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location", "bookmark"]
 
 
     if len(get_links(itemID)) > 1:
@@ -438,6 +452,8 @@ def view_detail(itemID):
         print(change_status(itemID))
     elif choice == "5":
         print(change_loc(itemID))
+    elif choice == "6":
+        print(bookmark(itemID))
     elif choice == "q":
         return quickrel 
     elif choice == "a" and not longView:
