@@ -307,29 +307,36 @@ def item_adder():
     else:
         return("chucking all that work out the window")
 
+def input_int():
+    ans = input()
+    if ans:
+        return ans
+    else:
+        return -1
+
 def pick_subcat():
     print_menu(core.subcategories)
     print("\n\t[  "+str(len(core.subcategories))+" ] (none)")
     print("\nset subcategory: ", end="")
-    return input()
+    return input_int()
 
 def pick_cat():
     print_menu(core.categories)
     print("\n\t[ "+str(len(core.categories))+" ] (none)")
     print("\nset category: ", end="")
-    return input()
+    return input_int()
 
 def pick_loc():
     print_menu(core.locations)
     print("\n\t[  "+str(len(core.locations))+" ] (none)")
     print("\nset location: ", end="")
-    return input()
+    return input_int()
 
 def pick_status():
     print_menu(core.statuses)
     print("\n\t[  "+str(len(core.statuses))+" ] (none)")
     print("\nset status: ", end="")
-    return input()
+    return input_int()
 
 ## menu views
 
@@ -587,13 +594,13 @@ def basic_settings(item):
     print(divider)
     loc = int(pick_loc())
 
-    if status != len(core.statuses):
+    if status != len(core.statuses) and status >+ 0:
         item.update({"status":core.statuses[status]})
-    if cat != len(core.categories):
+    if cat != len(core.categories) and cat >= 0:
         item.update({"cat":core.categories[cat]})
-    if subcat >= 0 and subcat != len(core.subcategories):
+    if subcat != len(core.subcategories) and subcat >= 0:
         item.update({"subcat":core.subcategories[subcat]})
-    if loc != len(core.locations):
+    if loc != len(core.locations) and loc >= 0:
         item.update({"loc":core.locations[loc]})
 
     return item
