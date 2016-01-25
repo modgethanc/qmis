@@ -17,7 +17,6 @@ goals:
     -reminder to look in on things after more than 12 months
 
 FEATURE TDL:
-- bookmark (add an item to scratchpad; work with scratchpad)
 - serial editing (present a data set, go into edit menu for each one)
 - importing aid: show random item to update
 
