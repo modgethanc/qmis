@@ -126,6 +126,7 @@ def search_data():
     global lastSearch
 
     print("SEARCH FILTERS")
+    print("--------------")
 
     search = {}
     search = basic_settings(search)
@@ -159,18 +160,15 @@ def toggle_view():
     print("\nTOGGLE VIEW")
     print("currently in ", end="")
     if longView:
-        print("full data view. toggle to short view? [y/n] ", end="")
+        query = "full data view. toggle to short view?"
     else:
-        print("short data view. toggle to full view? [y/n] ", end="")
+        query = "short data view. toggle to full view?"
 
-    choice = input()
-    if choice == "y":
+    if input_yn(query):
         longView = not longView
         return "toggling view"
-    elif choice == "n":
-        return "not toggling view"
     else:
-        return toggle_view()
+        return "not toggling view"
 
 def short_data(data):
     ids = core.get_all_ids(data)
@@ -202,19 +200,14 @@ def bookmark(itemID):
 def stamp_item(itemID):
     print("\nSTAMP ITEM")
     now = time.localtime
-    print("today is "+time.strftime("%d %B %Y")+". stamp this item with today? [y/n] ", end="")
 
-    choice = input()
-
-    if choice == "y":
+    if input_yn("today is "+time.strftime("%d %B %Y")+". stamp this item with today?"):
         links = get_links(itemID)
         for x in links:
             update_time(x)
         return "roger! stamped that sucker and everything attached to it"
-    elif choice == "n":
-        return "okay, not stamping a thing here"
     else:
-        return stamp_item(itemID)
+        return "okay, not stamping a thing here"
 
 def link_item(itemID):
     print("what do you want to link this to? ", end="")
@@ -229,23 +222,17 @@ def link_item(itemID):
     for x in links:
         print(single_item(x))
 
-    print("are you suuuuure you want to link them? [y/n] ", end="")
-    choice = input()
-
-    if choice == "y":
+    if input_yn("are you suuuuure you want to link them?"):
         core.link_ids(datafile, links)
         print("link successful")
         return
-    elif choice == "n":
+    else:
         print("LINK ABORTED")
         return
-    else:
-        return link_item(itemID)
 
 def unlink_item(itemID):
     if len(get_links(itemID)) < 2:
         return("it's not even linked to anything. so ronery.")
-
 
     if input_yn("are you suuure you want to break this away from its friends?"):
         core.unlink(datafile, itemID)
@@ -297,10 +284,8 @@ def item_adder():
 
     item.update({"links":[]})
     print(pretty_data(item))
-    print("add this? [y/n] ", end="")
 
-    ans = input()
-    if ans == "y":
+    if input_yn("add this?"):
         new = core.new_entry(datafile, item)
         datafile.update(new)
         print(short_data(new))
@@ -512,13 +497,15 @@ def view_detail(itemID):
 
     viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location", "bookmark"]
 
+    print(divider)
     if len(get_links(itemID)) > 1:
         for x in get_links(itemID):
             print(single_item(x))
     else:
         print(single_item(itemID))
 
-    print("\nITEM DEETS")
+    print("ITEM DEETS")
+    print("----------")
     print_menu(viewOptions)
     if not longView:
         print("\n\t[  a ] (show full detail view)")
