@@ -550,7 +550,8 @@ def edit_item(itemID):
     print(single_item(itemID))
     print("\nEDITING DEETS")
     i = 0
-    for x in iter(raw):
+    for x in sorted(raw.keys()):
+    #for x in iter(raw):
         print("\t[ ", end="")
         if i < 10:
             print(" ", end="")
