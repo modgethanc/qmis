@@ -138,16 +138,14 @@ def search_data():
 
         search.update({key:value})
 
+    print("search terms: "+str(search))
     lastSearch = core.multisearch(datafile, search)
-    #lastSearch = core.find_all(datafile, key, value)
     for x in lastSearch:
         print(pretty_data(core.get_by_id(datafile, x)))
-    return ""
+    return "total found: "+str(len(lastSearch))
 
 def count_data():
-    print("COUNTING DATA")
-
-    return "total: "+str(len(datafile))
+    return "total items: "+str(len(datafile))
 
 def show_dataset(data):
     if longView:
@@ -210,8 +208,6 @@ def stamp_item(itemID):
 
     if choice == "y":
         links = get_links(itemID)
-        #links = core.get_by_id(datafile, itemID).get(itemID).get("links")
-        #links.append(itemID)
         for x in links:
             update_time(x)
         return "roger! stamped that sucker and everything attached to it"
@@ -233,11 +229,6 @@ def link_item(itemID):
     for x in links:
         print(single_item(x))
 
-    #print("ITEM ONE")
-    #print(single_item(itemID))
-    #print("ITEM TWO")
-    #print(single_item(target))
-
     print("are you suuuuure you want to link them? [y/n] ", end="")
     choice = input()
 
@@ -252,10 +243,19 @@ def link_item(itemID):
         return link_item(itemID)
 
 def unlink_item(itemID):
-    return
+    if len(get_links(itemID)) < 2:
+        return("it's not even linked to anything. so ronery.")
+    else:
+        unlink = input_yn("are you suuure you want to break this away from its friends?")
+
+    if unlink:
+        core.unlink(datafile, itemID)
+        return "the operation was a success."
+    else:
+        return "UNLINK ABORTED"
+
 
 def change_status(itemID):
-    #raw = core.get_by_id(datafile, itemID)[itemID]
     statuscode = int(pick_status())
     links = get_links(itemID)
     for x in links:
@@ -264,7 +264,6 @@ def change_status(itemID):
     return "status updated!"
 
 def change_loc(itemID):
-    #raw = core.get_by_id(datafile, itemID)[itemID]
     loccode = int(pick_loc())
     links = get_links(itemID)
     for x in links:
@@ -284,11 +283,14 @@ def item_adder():
     item = {}
     item = basic_settings(item)
 
-    for x in core.defaults:
-        item.update(enter_data(x))
-
-    if item.get("cat") == core.categories[1]:
+    if item.get("cat") not in nodefaults:
+        for x in core.defaults:
+            item.update(enter_data(x))
+    elif item.get("cat") == core.categories[1]:
         for x in core.lensdefaults:
+            item.update(enter_data(x))
+    elif item.get("cat") == core.categories[8]:
+        for x in core.bookdefaults:
             item.update(enter_data(x))
 
     if core.is_multiple(item):
@@ -307,36 +309,89 @@ def item_adder():
     else:
         return("chucking all that work out the window")
 
+
+## input handlers
+
 def input_int():
+    # returns an int (TODO)
+
     ans = input()
-    if ans:
-        return ans
+
+    if ans.isdigit():
+        return int(ans)
+    elif not ans:
+        return False
     else:
-        return -1
+        print("it's gotta be a number from the list, or blank: ", end="")
+        return input_int()
+
+def input_yn(query):
+    # returns boolean True or False
+
+    print(query+" [y/n] ", end="")
+    ans = input()
+
+    while ans not in ["y", "n"]:
+        print("'y' or 'n' pls: ", end="")
+        ans = input()
+
+    if ans == "y":
+        return True
+    else:
+        return False
+
+def validate_index(target, ans):
+    # checks if ans is a valid index into list target
+
+    while ans >= len(core.statuses) or ans < 0:
+        print("no it's gotta be from the list! ", end="")
+        ans = input_int()
+
+    return ans
 
 def pick_subcat():
     print_menu(core.subcategories)
-    print("\n\t[  "+str(len(core.subcategories))+" ] (none)")
+    print("\n\t(leave blank for none)")
     print("\nset subcategory: ", end="")
-    return input_int()
+    ans = input_int()
+
+    if ans:
+        ans = validate_index(core.subcategories, ans)
+    
+    return ans
 
 def pick_cat():
     print_menu(core.categories)
-    print("\n\t[ "+str(len(core.categories))+" ] (none)")
+    print("\n\t(leave blank for none)")
     print("\nset category: ", end="")
-    return input_int()
+    ans = input_int()
+
+    if ans:
+        ans = validate_index(core.categories, ans)
+    
+    return ans
 
 def pick_loc():
     print_menu(core.locations)
-    print("\n\t[  "+str(len(core.locations))+" ] (none)")
+    print("\n\t(leave blank for none)")
     print("\nset location: ", end="")
-    return input_int()
+    ans = input_int()
+
+    if ans:
+        ans = validate_index(core.locations, ans)
+    
+    return ans
 
 def pick_status():
     print_menu(core.statuses)
-    print("\n\t[  "+str(len(core.statuses))+" ] (none)")
+    print("\n\t(leave blank for none)")
     print("\nset status: ", end="")
-    return input_int()
+    ans = input_int()
+
+    if ans:
+        ans = validate_index(core.statuses, ans)
+    
+    return ans
 
 ## menu views
 
@@ -390,9 +445,9 @@ def data_menu():
     elif choice == "2":
         scratch = []
     elif choice == "3":
-        #print(show_dataset(lastSearch))
         for x in lastSearch:
             print(pretty_data(core.get_by_id(datafile, x)))
+        print("total found: "+str(len(lastSearch)))
     elif choice == "4":
         print(toggle_view())
     elif choice == "5":
@@ -431,7 +486,6 @@ def view_detail(itemID):
 
     viewOptions = ["edit details", "stamp item", "link item", "unlink item", "change status", "change location", "bookmark"]
 
-
     if len(get_links(itemID)) > 1:
         for x in get_links(itemID):
             print(single_item(x))
@@ -462,13 +516,13 @@ def view_detail(itemID):
     elif choice == "6":
         print(bookmark(itemID))
     elif choice == "q":
-        return quickrel 
+        return quickrel
     elif choice == "a" and not longView:
         longView = True
         print("full deets")
         print(single_item(itemID))
         print("short deets")
-        longView = False 
+        longView = False
     else:
         print(invalid)
 
@@ -478,7 +532,7 @@ def view_detail(itemID):
 def edit_item(itemID):
     raw = core.get_by_id(datafile, itemID)[itemID]
     fields = []
-    
+
     print("")
     print(single_item(itemID))
     print("\nEDITING DEETS")
@@ -506,13 +560,13 @@ def edit_item(itemID):
         key = fields[int(choice)]
 
     if key == "cat":
-        value = core.categories[int(pick_cat())]
+        value = core.categories[pick_cat()]
     elif key == "subcat":
-        value = core.subcategories[int(pick_subcat())]
+        value = core.subcategories[pick_subcat()]
     elif key == "loc":
-        value = core.locations[int(pick_loc())]
+        value = core.locations[pick_loc()]
     elif key == "status":
-        value = core.statuses[int(pick_status())]
+        value = core.statuses[pick_status()]
     else:
         print("\t"+key+": ", end="")
         value = input()
@@ -582,25 +636,26 @@ def update_time(itemID):
 def basic_settings(item):
     # runs down basic shit for dict item
 
-    status = int(pick_status())
+    status = pick_status()
     print(divider)
-    cat = int(pick_cat())
+    cat = pick_cat()
     print(divider)
     if cat <= 2:
         print(divider)
-        subcat = int(pick_subcat())
+        subcat = pick_subcat()
     else:
-        subcat = -1
+        subcat = ""
     print(divider)
-    loc = int(pick_loc())
+    loc = pick_loc()
 
-    if status != len(core.statuses) and status >+ 0:
+    if status:
         item.update({"status":core.statuses[status]})
-    if cat != len(core.categories) and cat >= 0:
+    if cat:
+    #if cat != len(core.categories) and cat >= 0:
         item.update({"cat":core.categories[cat]})
-    if subcat != len(core.subcategories) and subcat >= 0:
+    if subcat:
         item.update({"subcat":core.subcategories[subcat]})
-    if loc != len(core.locations) and loc >= 0:
+    if loc:
         item.update({"loc":core.locations[loc]})
 
     return item

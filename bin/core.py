@@ -10,9 +10,11 @@ import util
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
 categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger"]
-statuses = ["circ", "surp", "sick", "scrap", "mia", "deac"]
+statuses = ["circ", "surp", "sick", "scrap", "mia", "static", "deac"]
 defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
 lensdefaults = ["focal length", "aperture", "mount"]
+bookdefaults = ["title", "author", "publisher", "isbn"]
+nodefaults = [categories[3], categories[8], categories[9]]
 multiples = [categories[0], categories[3], categories[4], categories[10]]
 
 ### basic data io
@@ -138,18 +140,19 @@ def multisearch(datafile, searchdict):
     fields = iter(searchdict)
 
     for x in ids:
-        found = False
+        #found = False
+        found = True
         item = get_by_id(datafile, x)[x]
 
         for y in iter(searchdict):
             #print(item)
             #print("searching for "+y+":"+searchdict.get(y))
-            print(item.get(y))
+            #print(item.get(y))
             if item.get(y) == searchdict.get(y):
                 found = True
             else:
                 found = False
-                break 
+                break
 
         if found:
             #print("FOUND "+x)
