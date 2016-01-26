@@ -3,6 +3,7 @@
 import os
 import json
 import time
+import itertools
 
 import util
 
@@ -132,6 +133,26 @@ def get_by_id(datafile, dataID):
 
     return item
 
+def get_all_fields(datafile):
+    # returns a list of all fields
+
+    fields = []
+    for x in datafile:
+        fields.extend(itertools.takewhile(lambda y: y not in fields, datafile[x].keys()))
+
+    return fields
+
+def get_all_values(datafile, field):
+    # returns a list of all values for a given field
+
+    values = []
+    for x in datafile:
+        check = datafile[x].get(field)
+        if check not in values:
+            values.append(check)
+
+    return values
+
 def multisearch(datafile, searchdict):
     # returns a list of all ids that satisfy search terms in the searchdict
 
@@ -174,7 +195,7 @@ def find_all(datafile, key, value):
     return matches
 
 def is_multiple(item):
-    return item.get("cat") in multiples 
+    return item.get("cat") in multiples
 
 ## testing shit
 
