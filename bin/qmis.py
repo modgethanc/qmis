@@ -51,8 +51,8 @@ def set_dir():
     workingdir = input()
 
     if not os.path.isdir(workingdir):
-        print("default directory does not exist. create it? [y/n] ", end="")
-        if input() == "n":
+
+        if not input_yn("default directory does not exist. create it?"):
             return set_dir()
     else:
         load_dir()
@@ -245,10 +245,9 @@ def link_item(itemID):
 def unlink_item(itemID):
     if len(get_links(itemID)) < 2:
         return("it's not even linked to anything. so ronery.")
-    else:
-        unlink = input_yn("are you suuure you want to break this away from its friends?")
 
-    if unlink:
+
+    if input_yn("are you suuure you want to break this away from its friends?"):
         core.unlink(datafile, itemID)
         return "the operation was a success."
     else:
@@ -392,6 +391,33 @@ def pick_status():
         ans = validate_index(core.statuses, ans)
     
     return ans
+
+def basic_settings(item):
+    # runs down basic shit for dict item
+
+    status = pick_status()
+    print(divider)
+    cat = pick_cat()
+    print(divider)
+    if cat <= 2:
+        print(divider)
+        subcat = pick_subcat()
+    else:
+        subcat = ""
+    print(divider)
+    loc = pick_loc()
+
+    if status:
+        item.update({"status":core.statuses[status]})
+    if cat:
+    #if cat != len(core.categories) and cat >= 0:
+        item.update({"cat":core.categories[cat]})
+    if subcat:
+        item.update({"subcat":core.subcategories[subcat]})
+    if loc:
+        item.update({"loc":core.locations[loc]})
+
+    return item
 
 ## menu views
 
@@ -559,19 +585,7 @@ def edit_item(itemID):
     else:
         key = fields[int(choice)]
 
-    if key == "cat":
-        value = core.categories[pick_cat()]
-    elif key == "subcat":
-        value = core.subcategories[pick_subcat()]
-    elif key == "loc":
-        value = core.locations[pick_loc()]
-    elif key == "status":
-        value = core.statuses[pick_status()]
-    else:
-        print("\t"+key+": ", end="")
-        value = input()
-
-    raw.update({key:value})
+    raw.update(edit_field(key))
     return edit_item(itemID)
 
 ## setup
@@ -619,13 +633,6 @@ def get_links(itemID):
 
 ## manipulation
 
-def add_new(data):
-    # add new data to local datafile
-
-    datafile.update(core.new_entry(datafile, data))
-
-    return k
-
 def update_time(itemID):
     # update itemID with current timestamp
 
@@ -633,32 +640,22 @@ def update_time(itemID):
     item = {itemID:core.update_time(core.get_by_id(datafile, itemID).get(itemID))}
     datafile.update(item)
 
-def basic_settings(item):
-    # runs down basic shit for dict item
+def edit_field(key):
+    # edits individual field
 
-    status = pick_status()
-    print(divider)
-    cat = pick_cat()
-    print(divider)
-    if cat <= 2:
-        print(divider)
-        subcat = pick_subcat()
+    if key == "cat":
+        value = core.categories[pick_cat()]
+    elif key == "subcat":
+        value = core.subcategories[pick_subcat()]
+    elif key == "loc":
+        value = core.locations[pick_loc()]
+    elif key == "status":
+        value = core.statuses[pick_status()]
     else:
-        subcat = ""
-    print(divider)
-    loc = pick_loc()
+        print("\t"+key+": ", end="")
+        value = input()
 
-    if status:
-        item.update({"status":core.statuses[status]})
-    if cat:
-    #if cat != len(core.categories) and cat >= 0:
-        item.update({"cat":core.categories[cat]})
-    if subcat:
-        item.update({"subcat":core.subcategories[subcat]})
-    if loc:
-        item.update({"loc":core.locations[loc]})
-
-    return item
+    return {key:value}
 
 ## DO THE THING
 
