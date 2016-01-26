@@ -269,7 +269,7 @@ def item_adder():
     item = {}
     item = basic_settings(item)
 
-    if item.get("cat") not in nodefaults:
+    if item.get("cat") not in core.nodefaults:
         for x in core.defaults:
             item.update(enter_data(x))
     elif item.get("cat") == core.categories[1]:
@@ -327,7 +327,7 @@ def input_yn(query):
 def validate_index(target, ans):
     # checks if ans is a valid index into list target
 
-    while ans >= len(core.statuses) or ans < 0:
+    while ans >= len(target) or ans < 0:
         print("no it's gotta be from the list! ", end="")
         ans = input_int()
 
