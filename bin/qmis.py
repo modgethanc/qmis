@@ -288,6 +288,7 @@ def item_adder():
     if input_yn("add this?"):
         new = core.new_entry(datafile, item)
         datafile.update(new)
+        core.clean_item(datafile, next(iter(new)))
         print(short_data(new))
         return("sweet! new toys.")
     else:
@@ -590,6 +591,8 @@ def load(filename):
     global datafile
 
     datafile = core.open_file(os.path.join(workingdir,filename))
+    core.clean_all(datafile)
+
     return "loaded "+filename
 
 def write(filename):
