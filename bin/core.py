@@ -115,6 +115,29 @@ def unlink_from(datafile, source, target):
 
     item.update({"links":links})
 
+def clean_all(datafile):
+    # clean blanks from every entry
+
+    ids = get_all_ids(datafile)
+
+    for x in ids:
+        clean_item(datafile, x)
+
+def clean_item(datafile, itemID):
+    # go through and remove all the blank fields
+
+    item = get_by_id(datafile, itemID)[itemID]
+    blanks = []
+
+    for x in iter(item):
+        if not item.get(x) or item.get(x) == "":
+            blanks.append(x)
+
+    for x in blanks:
+        del item[x]
+
+    return item
+
 ### data retrieval
 
 def get_all_ids(datafile):
