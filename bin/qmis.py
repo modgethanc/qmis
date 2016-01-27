@@ -130,14 +130,16 @@ def search_data():
 
     search = {}
     search = basic_settings(search)
-
-    print("other field? (i'm cap sensitive sorry. leave blank to cancel) ", end="")
-    key = input()
+    
+    fields = sorted(core.get_all_fields(datafile))
+    print_menu(fields)
+    print("other field? (leave blank to cancel) ", end="")
+    key = input_int()
     if key:
-        print("what's your search phrase? (still cap sensitive, sorry) ", end="")
+        print("what's your search phrase? (im cap sensitive, sorry) ", end="")
         value = input()
 
-        search.update({key:value})
+        search.update({fields[key]:value})
 
     print("search terms: "+str(search))
     lastSearch = core.multisearch(datafile, search)

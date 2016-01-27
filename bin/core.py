@@ -160,8 +160,12 @@ def get_all_fields(datafile):
     # returns a list of all fields
 
     fields = []
+
     for x in datafile:
-        fields.extend(itertools.takewhile(lambda y: y not in fields, datafile[x].keys()))
+        source = datafile[x].keys()
+        for x in source:
+            if x not in fields:
+                fields.append(x)
 
     return fields
 
