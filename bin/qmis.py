@@ -1,12 +1,14 @@
 #!/usr/bin/python
 
 import core
+import util
 
 import json
 import random
 import fileinput
 import os
 import time
+import colorama
 
 datafile = {}
 lastSearch = []
@@ -25,6 +27,7 @@ invalid = "\nno idea what you mean; you gotta pick a number from the list!"
 quickrel = "firing quick release!"
 
 def start():
+    colorama.init()
     print(header)
     print("")
     set_dir()
@@ -37,6 +40,7 @@ def start():
         print("?PANIC?")
         print(main_menu())
     print(footer)
+    colorama.deinit()
 
 def end():
     print(divider)
@@ -71,11 +75,13 @@ def print_menu(menu):
     print("OPTIONS!")
     i = 0
     for x in menu:
+        util.setrandcolor()
         print("\t[ ", end="")
         if i < 10:
             print(" ", end="")
         print(str(i)+" ] "+x)
         i += 1
+        util.resetcolor()
 
 def save_file():
     print("SAVING FILE")
@@ -130,21 +136,21 @@ def search_data():
 
     search = {}
     search = basic_settings(search)
-    
+
+    ## other field
     fields = sorted(core.get_all_fields(datafile))
-    print_menu(fields)
-    print("other field? (leave blank to cancel) ", end="")
-    key = input_int()
+    key = pick_list(fields, "other field")
+
     if key:
         print("what's your search phrase? (im cap sensitive, sorry) ", end="")
-        value = input()
+        search.update({key:input()})
 
-        search.update({fields[key]:value})
-
+    ## process results
     print("search terms: "+str(search))
     lastSearch = core.multisearch(datafile, search)
     for x in lastSearch:
         print(pretty_data(core.get_by_id(datafile, x)))
+
     return "total found: "+str(len(lastSearch))
 
 def count_data():
@@ -182,7 +188,7 @@ def short_data(data):
 
     return pretty_data(shortdata)
 
-def pick_item():
+def pick_id():
     print("give me an ID: (q to cancel) ", end="")
     ans = input()
     ids = core.get_all_ids(datafile)
@@ -193,7 +199,7 @@ def pick_item():
         return quickrel
     else:
         print("sorry, i didn't find that in the current dataset.")
-        return pick_item()
+        return pick_id()
 
 def bookmark(itemID):
     scratch.append(itemID)
@@ -213,24 +219,23 @@ def stamp_item(itemID):
 
 def link_item(itemID):
     print("what do you want to link this to? ", end="")
-    target = pick_item()
+    target = pick_id()
     links = [itemID, target]
     for x in links:
         item = core.get_by_id(datafile, x)
         check = item.get(x).get("links")
-        for y in check:
-            if y not in links:
-                links.append(y)
+        if check:
+            for y in check:
+                if y not in links:
+                    links.append(y)
     for x in links:
         print(single_item(x))
 
     if input_yn("are you suuuuure you want to link them?"):
         core.link_ids(datafile, links)
-        print("link successful")
-        return
+        return "link successful"
     else:
-        print("LINK ABORTED")
-        return
+        return "LINK ABORTED"
 
 def unlink_item(itemID):
     if len(get_links(itemID)) < 2:
@@ -300,13 +305,13 @@ def item_adder():
 ## input handlers
 
 def input_int():
-    # returns an int (TODO)
+    # returns an int, or False if blank
 
     ans = input()
 
     if ans.isdigit():
         return int(ans)
-    elif not ans:
+    elif ans == "":
         return False
     else:
         print("it's gotta be a number from the list, or blank: ", end="")
@@ -336,74 +341,44 @@ def validate_index(target, ans):
 
     return ans
 
-def pick_subcat():
-    print_menu(core.subcategories)
+def pick_list(options, caption):
+    # pass in a list of options with a caption, return answer
+
+    print_menu(options)
     print("\n\t(leave blank for none)")
-    print("\nset subcategory: ", end="")
+    print("\n"+caption+": ", end="")
     ans = input_int()
+    value = ""
 
-    if ans:
-        ans = validate_index(core.subcategories, ans)
-    
-    return ans
+    if ans is not False:
+        ans = validate_index(options, ans)
+        value = options[ans]
 
-def pick_cat():
-    print_menu(core.categories)
-    print("\n\t(leave blank for none)")
-    print("\nset category: ", end="")
-    ans = input_int()
-
-    if ans:
-        ans = validate_index(core.categories, ans)
-    
-    return ans
-
-def pick_loc():
-    print_menu(core.locations)
-    print("\n\t(leave blank for none)")
-    print("\nset location: ", end="")
-    ans = input_int()
-
-    if ans:
-        ans = validate_index(core.locations, ans)
-    
-    return ans
-
-def pick_status():
-    print_menu(core.statuses)
-    print("\n\t(leave blank for none)")
-    print("\nset status: ", end="")
-    ans = input_int()
-
-    if ans:
-        ans = validate_index(core.statuses, ans)
-    
-    return ans
+    return value
 
 def basic_settings(item):
     # runs down basic shit for dict item
 
-    status = pick_status()
+    status = pick_list(core.statuses, "set status")
     print(divider)
-    cat = pick_cat()
+    cat = pick_list(core.categories, "set category")
     print(divider)
-    if cat <= 2:
+    if cat in core.has_subcat:
         print(divider)
-        subcat = pick_subcat()
+        subcat = pick_list(core.subcategories, "set subcategory")
     else:
         subcat = ""
     print(divider)
-    loc = pick_loc()
+    loc = pick_list(core.locations, "set location")
 
     if status:
-        item.update({"status":core.statuses[status]})
+        item.update({"status":status})
     if cat:
-    #if cat != len(core.categories) and cat >= 0:
-        item.update({"cat":core.categories[cat]})
+        item.update({"cat":cat})
     if subcat:
-        item.update({"subcat":core.subcategories[subcat]})
+        item.update({"subcat":subcat})
     if loc:
-        item.update({"loc":core.locations[loc]})
+        item.update({"loc":loc})
 
     return item
 
@@ -466,7 +441,7 @@ def data_menu():
         print(toggle_view())
     elif choice == "5":
         print(divider)
-        itemID = pick_item()
+        itemID = pick_id()
         if itemID == quickrel:
             print(quickrel)
         else:
@@ -479,7 +454,7 @@ def data_menu():
         print(search_data())
     elif choice == "8":
         print(divider)
-        itemID = pick_item()
+        itemID = pick_id()
         if itemID == quickrel:
             print(quickrel)
         else:
@@ -620,7 +595,10 @@ def single_item(itemID):
 
 def get_links(itemID):
     links = []
-    links.extend(core.get_by_id(datafile, itemID).get(itemID).get("links"))
+    target = core.get_by_id(datafile, itemID).get(itemID).get("links")
+    if target:
+        links.extend(target)
+
     links.append(itemID)
     return links
 

@@ -17,6 +17,7 @@ lensdefaults = ["focal length", "aperture", "mount"]
 bookdefaults = ["title", "author", "publisher", "isbn"]
 nodefaults = [categories[3], categories[8], categories[9]]
 multiples = [categories[0], categories[3], categories[4], categories[10]]
+has_subcat = [categories[0], categories[1], categories[9]]
 
 ### basic data io
 
@@ -88,7 +89,7 @@ def link_together(datafile, source, target):
 
     item = get_by_id(datafile, source)[source]
     links = item.get("links")
-    if links == '':
+    if not links:
         links = []
 
     if target not in links:
@@ -188,14 +189,10 @@ def multisearch(datafile, searchdict):
     fields = iter(searchdict)
 
     for x in ids:
-        #found = False
         found = True
         item = get_by_id(datafile, x)[x]
 
         for y in iter(searchdict):
-            #print(item)
-            #print("searching for "+y+":"+searchdict.get(y))
-            #print(item.get(y))
             if item.get(y) == searchdict.get(y):
                 found = True
             else:
@@ -203,7 +200,6 @@ def multisearch(datafile, searchdict):
                 break
 
         if found:
-            #print("FOUND "+x)
             matches.append(x)
 
     return matches
