@@ -530,12 +530,14 @@ def edit_item(itemID):
     i = 0
     for x in sorted(raw.keys()):
     #for x in iter(raw):
+        util.setrandcolor()
         print("\t[ ", end="")
         if i < 10:
             print(" ", end="")
         print(str(i)+" ] "+x+": "+str(raw.get(x)))
         i += 1
         fields.append(x)
+        util.resetcolor()
 
     print("\n\t[  a ] (add new field)")
 
@@ -583,7 +585,19 @@ def random_item():
     return core.get_by_id(datafile, random.choice(ids))
 
 def pretty_data(data):
-    return json.dumps(data, sort_keys=True, indent=2, separators=(',',':'))
+    dump = ""
+
+    for x in data:
+        dump += util.attachrandcolor()
+        dump += "[ "+util.hilight(x)+" ]\n"+json.dumps(data[x], sort_keys=True, indent=2, separators=(',',':'))
+        dump += "\n\n"
+
+    dump += util.attachreset()
+    return dump
+    #return json.dumps(data, sort_keys=True, indent=2, separators=(',',':'))
+
+def rainbow_data_handler(item):
+    return
 
 def single_item(itemID):
     if longView:
@@ -615,13 +629,13 @@ def edit_field(key):
     # edits individual field
 
     if key == "cat":
-        value = core.categories[pick_cat()]
+        value = pick_list(core.categories, "set category")
     elif key == "subcat":
-        value = core.subcategories[pick_subcat()]
+        value = pick_list(core.subcategories, "set subcategory")
     elif key == "loc":
-        value = core.locations[pick_loc()]
+        value = pick_list(core.locations, "set location")
     elif key == "status":
-        value = core.statuses[pick_status()]
+        value = pick_list(core.statuses, "set status")
     else:
         print("\t"+key+": ", end="")
         value = input()

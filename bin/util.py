@@ -5,14 +5,7 @@ import colorama
 
 colorama.init()
 
-rainbow = [
-        colorama.Fore.RED,
-        colorama.Fore.GREEN,
-        colorama.Fore.YELLOW,
-        colorama.Fore.BLUE,
-        colorama.Fore.MAGENTA,
-        colorama.Fore.WHITE,
-        colorama.Fore.CYAN]
+textcolors = [ colorama.Fore.RED, colorama.Fore.GREEN, colorama.Fore.YELLOW, colorama.Fore.BLUE, colorama.Fore.MAGENTA, colorama.Fore.WHITE, colorama.Fore.CYAN]
 
 lastcolor = colorama.Fore.RESET
 
@@ -30,7 +23,7 @@ def setrandcolor():
 
     color = lastcolor
     while color == lastcolor:
-        color = random.choice(rainbow)
+        color = random.choice(textcolors)
 
     lastcolor = color
 
@@ -38,3 +31,19 @@ def setrandcolor():
 
 def resetcolor():
     print(colorama.Fore.RESET, end="")
+
+def attachrandcolor():
+    global lastcolor
+
+    color = lastcolor
+    while color == lastcolor:
+        color = random.choice(textcolors)
+
+    lastcolor = color
+    return color
+
+def attachreset():
+    return colorama.Style.RESET_ALL
+
+def hilight(text):
+    return colorama.Style.BRIGHT+text+colorama.Style.NORMAL
