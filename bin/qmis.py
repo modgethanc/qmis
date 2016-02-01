@@ -8,7 +8,6 @@ import random
 import fileinput
 import os
 import time
-import colorama
 
 datafile = {}
 lastSearch = []
@@ -27,8 +26,9 @@ invalid = "\nno idea what you mean; you gotta pick a number from the list!"
 quickrel = "firing quick release!"
 
 def start():
-    colorama.init()
+    util.setrandcolor()
     print(header)
+    util.resetcolor()
     print("")
     set_dir()
     try:
@@ -40,7 +40,6 @@ def start():
         print("?PANIC?")
         print(main_menu())
     print(footer)
-    colorama.deinit()
 
 def end():
     print(divider)
@@ -84,16 +83,20 @@ def print_menu(menu):
         util.resetcolor()
 
 def save_file():
+    print(divider)
     print("SAVING FILE")
+    print("-----------")
     print("current file list:")
     i = 0
     for x in files:
+        util.setrandcolor()
         print("\t[ "+str(i)+" ] "+x, end="")
         if i == working:
             print(" (loaded)")
         else:
             print("")
         i += 1
+        util.resetcolor()
     print("\t[ a ] (other)")
 
     print("\nwhere do you want to save? (q to cancel) ", end="")
@@ -249,19 +252,19 @@ def unlink_item(itemID):
 
 
 def change_status(itemID):
-    statuscode = int(pick_status())
+    status = pick_list(core.statuses, "set status")
     links = get_links(itemID)
     for x in links:
         raw = core.get_by_id(datafile, x)[x]
-        raw.update({"status":core.statuses[statuscode]})
+        raw.update({"status":status})
     return "status updated!"
 
 def change_loc(itemID):
-    loccode = int(pick_loc())
+    loc = pick_list(core.locations, "set location")
     links = get_links(itemID)
     for x in links:
         raw = core.get_by_id(datafile, x)[x]
-        raw.update({"loc":core.locations[loccode]})
+        raw.update({"loc":loc})
     return "location updated!"
 
 def enter_data(name):
@@ -387,7 +390,7 @@ def basic_settings(item):
 def main_menu():
     menuOptions = ["manipulate current dataset", "load new dataset", "save current dataset", "quit"]
 
-    print("")
+    print(divider)
     print("GETTING THINGS DONE")
     print("-------------------")
 

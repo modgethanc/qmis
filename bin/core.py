@@ -220,6 +220,49 @@ def find_all(datafile, key, value):
 def is_multiple(item):
     return item.get("cat") in multiples
 
+## output formatting
+
+def html_one(datafile, itemID):
+    unit = []
+
+    item = get_by_id(datafile, itemID)[itemID]
+    nick = item.get("nick")
+    name = item.get("name")
+    make = item.get("make")
+    model = item.get("model")
+    cat = item.get("cat")
+
+    unit.append("<div class=\"item\">\n\t<p><b>")
+
+    if nick:
+        unit.append(nick+"</b>")
+        if name:
+            unit.append(" <i>"+name+"</i>")
+        unit.append("</p>\n")
+
+        if make and model:
+            unit.append("\n\t<p>"+make+" "+model+"</p>\n")
+    else:
+        if name:
+            unit.append(name+"</b>")
+        elif make and model:
+            unit.append(make+" "+model+"</b> ")
+            if cat == categories[1]:
+                focal = item.get("focal length")
+                if focal:
+                    unit.append(focal)
+        else:
+            unit.append("</b>")
+
+        unit.append("</p>")
+        unit.append("\n\t<div class=\"meta\"><p><small>"+str(item)+"</small></p></div>")
+
+    unit.append("\n</div>\n")
+
+    return "".join(unit)
+
+
+
 ## testing shit
 
 sampleInfo = { "loc":locations,
