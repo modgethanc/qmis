@@ -220,6 +220,28 @@ def find_all(datafile, key, value):
 def is_multiple(item):
     return item.get("cat") in multiples
 
+def display_name(item):
+    # raw item
+
+    namegen = []
+    nick = item.get("nick")
+    name = item.get("name")
+    make = item.get("make")
+    model = item.get("model")
+    focal = item.get("focal length")
+
+    if nick:
+        namegen.append(nick)
+    elif name:
+        namegen.append(name)
+    elif make and model:
+        namegen.append(make)
+        namegen.append(model)
+        if focal:
+            namegen.append(focal)
+
+    return " ".join(namegen)
+
 ## output formatting
 
 def html_one(datafile, itemID):
@@ -231,17 +253,24 @@ def html_one(datafile, itemID):
     make = item.get("make")
     model = item.get("model")
     cat = item.get("cat")
+    subcat = item.get("subcat")
+    links = item.get("links")
 
-    unit.append("<div class=\"item\">\n\t<p><b>")
+    unit.append("<div class=\"item\"><a name=\""+itemID+"\"></a>\n\t<p><b>")
 
     if nick:
         unit.append(nick+"</b>")
+
         if name:
             unit.append(" <i>"+name+"</i>")
         unit.append("</p>\n")
 
         if make and model:
             unit.append("\n\t<p>"+make+" "+model+"</p>\n")
+
+        if subcat and cat:
+            unit.append("\n\t<p><small><i>"+subcat+" "+cat+"</i></small></p>")
+
     else:
         if name:
             unit.append(name+"</b>")
@@ -253,15 +282,32 @@ def html_one(datafile, itemID):
                     unit.append(focal)
         else:
             unit.append("</b>")
+        
+        if subcat and cat:
+            unit.append("\n\t<p><small><i>"+subcat+" "+cat+"</i></small></p>")
 
         unit.append("</p>")
-        unit.append("\n\t<div class=\"meta\"><p><small>"+str(item)+"</small></p></div>")
+    
+    if links:
+        unit.append("bundled with: ")
+        for x in links:
+            unit.append("<a href=\"#"+x+"\">"+display_name(get_by_id(datafile, x)[x])+"</a> ")
+
+    unit.append("\n\t<div class=\"meta\"><p><small>"+itemID+" "+str(item)+"</small></p></div>")
 
     unit.append("\n</div>\n")
 
     return "".join(unit)
 
+def html_cat(datafile, category):
+    items = []
+    ids = get_all_ids(datafile)
 
+    for x in ids:
+        if get_by_id(datafile, x)[x].get("cat") == category:
+            items.append(html_one(datafile, x))
+
+    return "".join(items)
 
 ## testing shit
 
