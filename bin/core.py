@@ -220,8 +220,10 @@ def find_all(datafile, key, value):
 def is_multiple(item):
     return item.get("cat") in multiples
 
+## human-readable formatting
+
 def display_name(item):
-    # raw item
+    # generates human-readable display name from raw item
 
     namegen = []
     nick = item.get("nick")
@@ -229,6 +231,10 @@ def display_name(item):
     make = item.get("make")
     model = item.get("model")
     focal = item.get("focal length")
+    kit = item.get("kit")
+    num = item.get("number")
+    title = item.get("title")
+    author = item.get("author")
 
     if nick:
         namegen.append(nick)
@@ -237,77 +243,44 @@ def display_name(item):
     elif make and model:
         namegen.append(make)
         namegen.append(model)
-        if focal:
-            namegen.append(focal)
+    elif model:
+        namegen.append(model)
+    elif make:
+        namegen.append(make)
+    elif kit:
+        namegen.append(kit)
+    elif title and author:
+        namegen.append("\""+title+"\" "+author)
+
+    if focal:
+        namegen.append(" "+focal)
+
+    if num:
+        namegen.append(" "+num)
 
     return " ".join(namegen)
 
-## output formatting
+def display_cat(item):
+    # generates human-readable categories from raw item
 
-def html_one(datafile, itemID):
-    unit = []
-
-    item = get_by_id(datafile, itemID)[itemID]
-    nick = item.get("nick")
-    name = item.get("name")
-    make = item.get("make")
-    model = item.get("model")
+    catgen = []
     cat = item.get("cat")
     subcat = item.get("subcat")
-    links = item.get("links")
 
-    unit.append("<div class=\"item\"><a name=\""+itemID+"\"></a>\n\t<p><b>")
-
-    if nick:
-        unit.append(nick+"</b>")
-
-        if name:
-            unit.append(" <i>"+name+"</i>")
-        unit.append("</p>\n")
-
-        if make and model:
-            unit.append("\n\t<p>"+make+" "+model+"</p>\n")
-
-        if subcat and cat:
-            unit.append("\n\t<p><small><i>"+subcat+" "+cat+"</i></small></p>")
-
+    if subcat == subcategories[4]:
+        if cat == categories[0]:
+            return "enlarger chassis"
+        elif cat:
+            return subcat + " " + cat
     else:
-        if name:
-            unit.append(name+"</b>")
-        elif make and model:
-            unit.append(make+" "+model+"</b> ")
-            if cat == categories[1]:
-                focal = item.get("focal length")
-                if focal:
-                    unit.append(focal)
-        else:
-            unit.append("</b>")
-        
-        if subcat and cat:
-            unit.append("\n\t<p><small><i>"+subcat+" "+cat+"</i></small></p>")
+        if subcat and subcat != "none":
+            catgen.append(subcat + " format ")
+            if cat:
+                catgen.append(cat)
+        elif cat:
+            catgen.append(cat)
 
-        unit.append("</p>")
-    
-    if links:
-        unit.append("bundled with: ")
-        for x in links:
-            unit.append("<a href=\"#"+x+"\">"+display_name(get_by_id(datafile, x)[x])+"</a> ")
-
-    unit.append("\n\t<div class=\"meta\"><p><small>"+itemID+" "+str(item)+"</small></p></div>")
-
-    unit.append("\n</div>\n")
-
-    return "".join(unit)
-
-def html_cat(datafile, category):
-    items = []
-    ids = get_all_ids(datafile)
-
-    for x in ids:
-        if get_by_id(datafile, x)[x].get("cat") == category:
-            items.append(html_one(datafile, x))
-
-    return "".join(items)
+    return " ".join(catgen)
 
 ## testing shit
 

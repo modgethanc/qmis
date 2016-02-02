@@ -2,6 +2,7 @@
 
 import core
 import util
+import html
 
 import json
 import random
@@ -111,7 +112,8 @@ def save_file():
         load_dir() # refresh file list!
     else:
         save = files[int(choice)]
-
+    
+    html.cats(datafile)
     write(save)
     return "\nsaved to "+save
 
