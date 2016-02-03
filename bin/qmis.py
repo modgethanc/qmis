@@ -473,6 +473,7 @@ def data_menu():
     else:
         print(invalid)
 
+    autosave()
     return data_menu()
 
 def view_detail(itemID):
@@ -522,7 +523,6 @@ def view_detail(itemID):
     else:
         print(invalid)
 
-    autosave()
     return view_detail(itemID)
 
 def edit_item(itemID):

@@ -10,8 +10,8 @@ import util
 ## CONSTANTS
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
 categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
-subcategories = ["35mm", "medium", "large", "digital", "enlarger"]
-statuses = ["circ", "surp", "sick", "scrap", "mia", "static", "deac"]
+subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
+statuses = ["circ", "surp", "sick", "scrap", "mia", "static", "deac", "staff", "unknown"]
 defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
 lensdefaults = ["focal length", "aperture", "mount"]
 bookdefaults = ["title", "author", "publisher", "isbn"]
@@ -58,6 +58,10 @@ def validate(data):
 
     if "date added" not in data:
         data.update({"date added":time.time()})
+    if "status" not in data:
+        data.update({"status":statuses[8]})
+    if "subcat" not in data:
+        item.update({"subcat":subcategories[5]})
 
     return data
 
@@ -117,6 +121,7 @@ def unlink_from(datafile, source, target):
     item.update({"links":links})
 
 def clean_all(datafile):
+
     # clean blanks from every entry
 
     ids = get_all_ids(datafile)
@@ -125,7 +130,7 @@ def clean_all(datafile):
         clean_item(datafile, x)
 
 def clean_item(datafile, itemID):
-    # go through and remove all the blank fields
+    # go through and remove all the blank fields and add unknowns
 
     item = get_by_id(datafile, itemID)[itemID]
     blanks = []
@@ -136,6 +141,12 @@ def clean_item(datafile, itemID):
 
     for x in blanks:
         del item[x]
+
+    if not item.get("status"):
+        item.update({"status":statuses[8]})
+
+    if not item.get("subcat"):
+        item.update({"subcat":subcategories[5]})
 
     return item
 
@@ -252,7 +263,7 @@ def display_name(item):
     elif title and author:
         namegen.append("\""+title+"\" "+author)
 
-    if focal:
+    if focal and not name:
         namegen.append(" "+focal)
 
     if num:
