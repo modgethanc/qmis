@@ -2,7 +2,7 @@
 
 import core
 import util
-import html
+import qmis_html
 
 import json
 import random
@@ -113,7 +113,7 @@ def save_file():
     else:
         save = files[int(choice)]
     
-    html.cats(datafile)
+    qmis_html.sortable(datafile)
     write(save)
     return "\nsaved to "+save
 

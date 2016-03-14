@@ -9,7 +9,7 @@ import util
 
 ## CONSTANTS
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
-categories = ["camera body", "camera lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
+categories = ["camera body", "lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
 statuses = ["circ", "surp", "sick", "scrap", "mia", "static", "deac", "staff", "unknown"]
 defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
@@ -246,6 +246,7 @@ def display_name(item):
     num = item.get("number")
     title = item.get("title")
     author = item.get("author")
+    cat = item.get("cat")
 
     if nick:
         namegen.append(nick)
@@ -267,7 +268,10 @@ def display_name(item):
         namegen.append(" "+focal)
 
     if num:
-        namegen.append(" "+num)
+        namegen.append(" #"+num)
+
+    if cat == categories[9]:
+        namegen.append(" Kit")
 
     return " ".join(namegen)
 
@@ -292,6 +296,18 @@ def display_cat(item):
             catgen.append(cat)
 
     return " ".join(catgen)
+
+def display_last_checked(item):
+    # generates human-readable timestamp if it's a time, or show the value
+
+    ts = item.get("last updated")
+
+    if isinstance(ts, float):
+        return time.strftime("%m/%d/%y %H:%M", time.localtime(ts))
+    elif not ts:
+        return ""
+    else:
+        return str(ts)
 
 ## testing shit
 
