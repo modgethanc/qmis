@@ -9,7 +9,7 @@ import util
 
 ## CONSTANTS
 locations = ["eqo", "fac", "qmd", "ss", "dark", "dig", "hall", "class", "out"]
-categories = ["camera body", "lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc"]
+categories = ["camera body", "lens", "camera accessory", "tripod", "light meter", "lighting", "electronic", "tool", "book", "outfit", "timer", "darkroom accessory", "lighting accessory", "misc", "tripod head", "tripod legs"]
 subcategories = ["35mm", "medium", "large", "digital", "enlarger", "none"]
 statuses = ["circ", "surp", "sick", "scrap", "mia", "static", "deac", "staff", "unknown"]
 defaults = ["make", "model", "name", "nick", "serial", "cmu", "provenance", "notes"]
@@ -61,7 +61,7 @@ def validate(data):
     if "status" not in data:
         data.update({"status":statuses[8]})
     if "subcat" not in data:
-        item.update({"subcat":subcategories[5]})
+        data.update({"subcat":subcategories[5]})
 
     return data
 
