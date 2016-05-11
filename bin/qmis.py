@@ -16,22 +16,25 @@ scratch = []
 keys = []
 files = []
 working = ""
-workingdir = ""
+workingdir = "/home/hvincent/projects/qmis/data/"
 longView = True
 auto = ""
 
-header = open("header.txt").read()
+header = open("/home/hvincent/projects/qmis/bin/header.txt").read()
 footer = "\nsee you later, space cowboy..."
 divider = "\n\n\n\n\n"
 invalid = "\nno idea what you mean; you gotta pick a number from the list!"
 quickrel = "firing quick release!"
 
 def start():
+    os.system("clear")
     util.setrandcolor()
     print(header)
     util.resetcolor()
     print("")
-    set_dir()
+    load_dir()
+    #set_dir()
+    
     try:
         print(main_menu())
     except ValueError:
