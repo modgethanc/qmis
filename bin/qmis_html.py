@@ -14,7 +14,7 @@ coloredstatus = ["\"green\">in circulation", "\"blue\">surplus", "\"orange\">sic
 
 statuscolor = ["green", "blue", "orange", "orange", "red", "black", "red", "black", "gray"]
 
-nocount = ["scrap", "mia", "deac"]
+nocount = ["scrap", "mia", "deac", "surp"]
 
 ## helpers
 
@@ -150,8 +150,6 @@ def sortable(datafile):
         total += 1
         item = core.get_by_id(datafile, itemID)[itemID]
 
-        if item.get("status") in nocount:
-            total -= 1
         outfile.write("<tr style=\"color:"+status_color(item)+"\"><td>")
         outfile.write(core.display_name(item)+"</td><td>")
         #outfile.write(str(item.get("name"))+"</td><td>")
@@ -175,7 +173,11 @@ def sortable(datafile):
         if isinstance(timestamp, float):
             if timestamp > 1462398232:
                 color = "<font color=green>"
-                done += 1
+                if item.get("status") not in nocount:
+                    done += 1
+
+        if item.get("status") in nocount:
+            total -= 1
         #outfile.write(color+core.display_last_checked(item)+"</font></td><td>")
         outfile.write(color+str(timestamp)+"</font></td><td>")
         #outfile.write(str(item.get("last updated"))+"</td><td>")
