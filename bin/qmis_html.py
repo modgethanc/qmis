@@ -176,6 +176,10 @@ def sortable(datafile):
                 if item.get("status") not in nocount:
                     done += 1
 
+        # comment this for closing check
+        color = ""
+        #
+
         if item.get("status") in nocount:
             total -= 1
         #outfile.write(color+core.display_last_checked(item)+"</font></td><td>")
@@ -187,7 +191,8 @@ def sortable(datafile):
     outfile.write("</table>")
 
     completion = int(100*float(done)/float(total))
-    outfile.write("<div style=\"float:right; position:absolute;top:0em; right:.5em;\"><p>"+str(done)+"/"+str(total)+" ("+str(completion)+"%)</div>")
+    # (for closing check only
+    # outfile.write("<div style=\"float:right; position:absolute;top:0em; right:.5em;\"><p>"+str(done)+"/"+str(total)+" ("+str(completion)+"%)</div>")
     outfile.write("<p> </p>")
     outfile.write("<p> </p>")
     outfile.write("<p> </p>")
