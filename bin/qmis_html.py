@@ -14,7 +14,9 @@ coloredstatus = ["\"green\">in circulation", "\"blue\">surplus", "\"orange\">sic
 
 statuscolor = ["green", "blue", "orange", "orange", "red", "black", "red", "black", "gray"]
 
-nocount = ["scrap", "mia", "deac", "surp"]
+#toggle static for spring/fall closing
+#nocount = ["scrap", "mia", "deac", "surp", "static", "staff"]
+closing = ["circ"]
 
 ## helpers
 
@@ -171,20 +173,22 @@ def sortable(datafile):
         timestamp = item.get("last updated")
         color = "<font color=red>"
         if isinstance(timestamp, float):
-            if timestamp > 1462398232:
+            ## set this for closing mode
+            if timestamp > 1481209878:
                 color = "<font color=green>"
-                if item.get("status") not in nocount:
+                #if item.get("status") not in nocount:
+                if item.get("status") in closing:
                     done += 1
+            #timestamp = time.strftime("%Y-%m-%d:%H%M", time.localtime(timestamp))
 
         # comment this for closing check
-        color = ""
+        #color = ""
         #
 
-        if item.get("status") in nocount:
+        if item.get("status") not in closing:
+        #if item.get("status") in nocount:
             total -= 1
-        #outfile.write(color+core.display_last_checked(item)+"</font></td><td>")
         outfile.write(color+str(timestamp)+"</font></td><td>")
-        #outfile.write(str(item.get("last updated"))+"</td><td>")
         outfile.write("<font color=black>"+str(itemID)+"</font><a name=\""+itemID+"\"></a></td>")
         outfile.write("</tr>\n")
 
@@ -192,7 +196,7 @@ def sortable(datafile):
 
     completion = int(100*float(done)/float(total))
     # (for closing check only
-    # outfile.write("<div style=\"float:right; position:absolute;top:0em; right:.5em;\"><p>"+str(done)+"/"+str(total)+" ("+str(completion)+"%)</div>")
+    outfile.write("<div style=\"float:right; position:absolute;top:0em; right:.5em;\"><p>"+str(done)+"/"+str(total)+" ("+str(completion)+"%)</div>")
     outfile.write("<p> </p>")
     outfile.write("<p> </p>")
     outfile.write("<p> </p>")
