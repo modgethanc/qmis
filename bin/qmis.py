@@ -16,11 +16,13 @@ scratch = []
 keys = []
 files = []
 working = ""
-workingdir = "/home/hvincent/projects/qmis/data/"
+#workingdir = "/home/hvincent/projects/qmis/data/"
+workingdir = "/Users/hvincent/private/repos/qmis/data"
 longView = True
 auto = ""
 
-header = open("/home/hvincent/projects/qmis/bin/header.txt").read()
+#header = open("/home/hvincent/projects/qmis/bin/header.txt").read()
+header = open("/Users/hvincent/private/repos/qmis/bin/header.txt").read()
 footer = "\nsee you later, space cowboy..."
 divider = "\n\n\n\n\n"
 invalid = "\nno idea what you mean; you gotta pick a number from the list!"
@@ -116,7 +118,7 @@ def save_file():
     else:
         save = files[int(choice)]
     
-    qmis_html.sortable(datafile)
+    #qmis_html.sortable(datafile)
     write(save)
     return "\nsaved to "+save
 
@@ -583,6 +585,7 @@ def load(filename):
     return "loaded "+filename
 
 def write(filename):
+    qmis_html.sortable(datafile)
     core.update_file(os.path.join(workingdir, filename), datafile)
     return "updated "+filename
 
