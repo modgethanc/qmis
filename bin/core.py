@@ -32,22 +32,6 @@ has_subcat = [categories[0], categories[1], categories[9]]
 
 ### basic data io
 
-def open_file(filename):
-    '''opens filename.json file and returns dict (blank if no file)'''
-
-    if not os.path.isfile(filename):
-        return {}
-    else:
-        return json.load(open(filename))
-
-def update_file(filename, j):
-    '''overwrites filename.json file with dict j'''
-
-    datafile = open(filename, 'w')
-    datafile.write(json.dumps(j, sort_keys=True, indent=2, separators=(',', ':')))
-
-    #return j
-
 def new_entry(datafile, data):
     '''creates a new entry in dict j with dict data to dict made from
        filename.json'''

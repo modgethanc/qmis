@@ -1,7 +1,18 @@
 #!/usr/bin/python
 
+'''QMIS utilities
+
+This module provides some helper shortcuts for QMIS.
+
+Vincent Zeng, Quartermaster
+hvincent@modgethanc.com'''
+
+__author__ = "Vincent Zeng (hvincent@modgethanc.com)"
+
 import random
 import colorama
+import os
+import json
 
 colorama.init()
 
@@ -49,3 +60,54 @@ def attachreset():
 
 def hilight(text):
     return colorama.Style.BRIGHT+text+colorama.Style.NORMAL
+
+def open_file(filename):
+    '''opens filename.json file and returns dict (blank if no file)'''
+
+    if not os.path.isfile(filename):
+        return {}
+    else:
+        return json.load(open(filename))
+
+def update_file(filename, j):
+    '''overwrites filename.json file with dict j'''
+
+    datafile = open(filename, 'w')
+    datafile.write(json.dumps(j, sort_keys=True, indent=2, separators=(',', ':')))
+
+
+def pretty_data(data):
+    dump = ""
+
+    for x in data:
+        dump += attachrandcolor()
+        dump += "[ "+hilight(x)+" ]\n"+json.dumps(data[x], sort_keys=True, indent=2, separators=(',',':'))
+        dump += "\n\n"
+
+    dump += attachreset()
+
+    return dump
+
+def print_menu(menu):
+    i = 0
+    for x in menu:
+        setrandcolor()
+        print("\t[ ", end="")
+        if i < 10:
+            print(" ", end="")
+        print(str(i)+" ] "+x)
+        i += 1
+        resetcolor()
+
+def refresh(header, leftover=""):
+    '''Refresh the display and reprint the header. If there's a leftover
+    message, print that as well.'''
+
+    os.system("clear")
+    setrandcolor()
+    print(header)
+    resetcolor()
+
+    if leftover:
+        print("> " + leftover + "\n")
+

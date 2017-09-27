@@ -3,7 +3,7 @@
 '''
 Main QMIS Interface
 
-This module provides a command-line interface for all QMIS functions
+This module provides the command-line interface for all QMIS functions.
 
 Vincent Zeng, Quartermaster
 hvincent@modgethanc.com'''
@@ -26,12 +26,14 @@ scratch = []
 keys = []
 files = []
 working = ""
-#workingdir = "/home/hvincent/projects/qmis/data/"
 workingdir = "/Users/hvincent/private/repos/qmis/data"
+DATA = os.path.join("Users", "hvincent", "private", "repos", "qmis", "data")
+DIR_INV = os.path.join(DATA, "inventory")
+DIR_ROSTER = os.path.join(DATA, "rosters")
+
 longView = True
 auto = ""
 
-#header = open("/home/hvincent/projects/qmis/bin/header.txt").read()
 header = open("/Users/hvincent/private/repos/qmis/bin/header.txt").read()
 footer = "\nsee you later, space cowboy..."
 divider = "\n\n\n\n\n"
@@ -39,10 +41,7 @@ invalid = "\nno idea what you mean; you gotta pick a number from the list!"
 quickrel = "firing quick release!"
 
 def start():
-    os.system("clear")
-    util.setrandcolor()
-    print(header)
-    util.resetcolor()
+    util.refresh(header)
     print("")
     load_dir()
     #set_dir()
@@ -86,18 +85,6 @@ def autosave():
 
 ## menu handlers
 
-def print_menu(menu):
-    print("OPTIONS!")
-    i = 0
-    for x in menu:
-        util.setrandcolor()
-        print("\t[ ", end="")
-        if i < 10:
-            print(" ", end="")
-        print(str(i)+" ] "+x)
-        i += 1
-        util.resetcolor()
-
 def save_file():
     print(divider)
     print("SAVING FILE")
@@ -137,7 +124,7 @@ def choose_file():
     print("\nLOADING FILE")
 
     print("i found these files: \n")
-    print_menu(files)
+    util.print_menu(files)
 
     print("\npick one to load (q to cancel): ", end="")
     choice = input()
@@ -169,7 +156,7 @@ def search_data():
     print("search terms: "+str(search))
     lastSearch = core.multisearch(datafile, search)
     for x in lastSearch:
-        print(pretty_data(core.get_by_id(datafile, x)))
+        print(util.pretty_data(core.get_by_id(datafile, x)))
 
     return "total found: "+str(len(lastSearch))
 
@@ -178,7 +165,7 @@ def count_data():
 
 def show_dataset(data):
     if longView:
-        return pretty_data(data)
+        return util.pretty_data(data)
     else:
         return short_data(data)
 
@@ -206,7 +193,7 @@ def short_data(data):
         item = {x:{"make":raw.get("make"), "model":raw.get("model"), "name":raw.get("name"), "nick":raw.get("nick")}}
         shortdata.update(item)
 
-    return pretty_data(shortdata)
+    return util.pretty_data(shortdata)
 
 def pick_id():
     print("give me an ID: (q to cancel) ", end="")
@@ -310,7 +297,7 @@ def item_adder():
         item.update(enter_data("number"))
 
     item.update({"links":[]})
-    print(pretty_data(item))
+    print(util.pretty_data(item))
 
     if input_yn("add this?"):
         new = core.new_entry(datafile, item)
@@ -364,7 +351,7 @@ def validate_index(target, ans):
 def pick_list(options, caption):
     # pass in a list of options with a caption, return answer
 
-    print_menu(options)
+    util.print_menu(options)
     print("\n\t(leave blank for none)")
     print("\n"+caption+": ", end="")
     ans = input_int()
@@ -405,13 +392,38 @@ def basic_settings(item):
 ## menu views
 
 def main_menu():
-    menuOptions = ["manipulate current dataset", "load new dataset", "save current dataset", "quit"]
+    '''Main controller.'''
 
-    print(divider)
-    print("GETTING THINGS DONE")
-    print("-------------------")
+    menuOptions = ["Inventory Hell", "Roster Rodeo", "Ollie Outie"]
 
-    print_menu(menuOptions)
+    util.print_menu(menuOptions)
+
+    print("\nwhere do you wanna go: ", end="")
+    choice = input()
+
+    if choice == "0":
+        util.refresh(header, inventory_menu())
+    elif choice == "1":
+        util.refresh(header, roster_menu())
+    elif choice == "2":
+        return end()
+    elif choice == 'q':
+        return quickrel
+    else:
+        print(invalid)
+
+    return main_menu()
+
+def inventory_menu():
+    '''Top-level inventory handler.'''
+
+    menuOptions = ["manipulate current dataset", "load new dataset", "save current dataset"]
+
+    util.refresh(header)
+    print("WELCOME TO INVENTORY HELL")
+    print("-------------------------")
+
+    util.print_menu(menuOptions)
 
     print("\ntell me your desires: ", end="")
     choice = input()
@@ -423,15 +435,17 @@ def main_menu():
         print(choose_file())
     elif choice == "2":
         print(save_file())
-    elif choice == "3":
-        print(divider)
-        return end()
     elif choice == 'q':
         return quickrel
     else:
         print(invalid)
 
-    return main_menu()
+    return inventory_menu()
+
+def roster_menu():
+    '''Top-level roster handling.'''
+
+    return "that isn't working yet"
 
 def data_menu():
     global scratch
@@ -441,7 +455,7 @@ def data_menu():
     print("DATA BROWSING")
     print("-------------")
 
-    print_menu(dataOptions)
+    util.print_menu(dataOptions)
 
     print("\ntell me your desires (q to cancel): ", end="")
     choice = input()
@@ -450,12 +464,12 @@ def data_menu():
         print(show_dataset(datafile))
     elif choice == "1":
         for x in scratch:
-            print(pretty_data(core.get_by_id(datafile, x)))
+            print(util.pretty_data(core.get_by_id(datafile, x)))
     elif choice == "2":
         scratch = []
     elif choice == "3":
         for x in lastSearch:
-            print(pretty_data(core.get_by_id(datafile, x)))
+            print(util.pretty_data(core.get_by_id(datafile, x)))
         print("total found: "+str(len(lastSearch)))
     elif choice == "4":
         print(toggle_view())
@@ -505,7 +519,7 @@ def view_detail(itemID):
 
     print("ITEM DEETS")
     print("----------")
-    print_menu(viewOptions)
+    util.print_menu(viewOptions)
     if not longView:
         print("\n\t[  a ] (show full detail view)")
 
@@ -589,14 +603,14 @@ def load_dir():
 def load(filename):
     global datafile
 
-    datafile = core.open_file(os.path.join(workingdir,filename))
+    datafile = util.open_file(os.path.join(workingdir,filename))
     core.clean_all(datafile)
 
     return "loaded "+filename
 
 def write(filename):
     qmis_html.sortable(datafile)
-    core.update_file(os.path.join(workingdir, filename), datafile)
+    util.update_file(os.path.join(workingdir, filename), datafile)
     return "updated "+filename
 
 ## retrieval
@@ -604,18 +618,6 @@ def write(filename):
 def random_item():
     ids = core.get_all_ids(datafile)
     return core.get_by_id(datafile, random.choice(ids))
-
-def pretty_data(data):
-    dump = ""
-
-    for x in data:
-        dump += util.attachrandcolor()
-        dump += "[ "+util.hilight(x)+" ]\n"+json.dumps(data[x], sort_keys=True, indent=2, separators=(',',':'))
-        dump += "\n\n"
-
-    dump += util.attachreset()
-    return dump
-    #return json.dumps(data, sort_keys=True, indent=2, separators=(',',':'))
 
 def rainbow_data_handler(item):
     return
@@ -626,7 +628,7 @@ def single_item(itemID):
     else:
         raw = core.get_by_id(datafile, itemID)[itemID]
         data = {itemID:{"make":raw.get("make"), "model":raw.get("model")}}
-    return pretty_data(data)
+    return util.pretty_data(data)
 
 def get_links(itemID):
     links = []
