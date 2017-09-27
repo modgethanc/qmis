@@ -1,5 +1,15 @@
 #!/usr/bin/python
 
+'''
+QMIS HTML operations
+
+
+Vincent Zeng, Quartermaster
+hvincent@modgethanc.com
+'''
+
+__author__="Vincent Zeng (hvincent@modgethanc.com)"
+
 import os
 import json
 import time

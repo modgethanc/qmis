@@ -1,5 +1,15 @@
 #!/usr/bin/python
 
+'''
+Main QMIS Interface
+
+This module provides a command-line interface for all QMIS functions
+
+Vincent Zeng, Quartermaster
+hvincent@modgethanc.com'''
+
+__author__= "Vincent Zeng (hvincent@modgethanc.com)"
+
 import core
 import util
 import qmis_html
@@ -36,7 +46,7 @@ def start():
     print("")
     load_dir()
     #set_dir()
-    
+
     try:
         print(main_menu())
     except ValueError:
@@ -117,7 +127,7 @@ def save_file():
         load_dir() # refresh file list!
     else:
         save = files[int(choice)]
-    
+
     #qmis_html.sortable(datafile)
     write(save)
     return "\nsaved to "+save

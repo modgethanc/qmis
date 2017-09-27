@@ -10,6 +10,8 @@ textcolors = [ colorama.Fore.RED, colorama.Fore.GREEN, colorama.Fore.YELLOW, col
 lastcolor = colorama.Fore.RESET
 
 def genID(digits=5):
+    '''Generates a numeric ID with given number of digits (default 5)'''
+
     id = ""
     x  = 0
     while x < digits:

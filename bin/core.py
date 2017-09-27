@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+'''
+QMIS inventory operations.
+
+This module performs manipulations on the inventory dataset.
+
+Vincent Zeng, Quartermaster
+hvincent@modgethanc.com
+'''
+
+__author__="Vincent Zeng (hvincent@modgethanc.com)"
+
 import os
 import json
 import time
@@ -22,7 +33,7 @@ has_subcat = [categories[0], categories[1], categories[9]]
 ### basic data io
 
 def open_file(filename):
-    # opens filename.json file and returns dict (blank if no file)
+    '''opens filename.json file and returns dict (blank if no file)'''
 
     if not os.path.isfile(filename):
         return {}
@@ -30,7 +41,7 @@ def open_file(filename):
         return json.load(open(filename))
 
 def update_file(filename, j):
-    # overwrites filename.json file with dict j
+    '''overwrites filename.json file with dict j'''
 
     datafile = open(filename, 'w')
     datafile.write(json.dumps(j, sort_keys=True, indent=2, separators=(',', ':')))
@@ -38,7 +49,8 @@ def update_file(filename, j):
     #return j
 
 def new_entry(datafile, data):
-    # creates a new entry in dict j with dict data to dict made from filename.json
+    '''creates a new entry in dict j with dict data to dict made from
+       filename.json'''
 
     validate(data)
 
@@ -54,7 +66,7 @@ def new_entry(datafile, data):
 ### data manipulation
 
 def validate(data):
-    # checks dict data for required elements
+    '''checks dict data for required elements'''
 
     if "date added" not in data:
         data.update({"date added":time.time()})
@@ -66,7 +78,7 @@ def validate(data):
     return data
 
 def update_time(data):
-    # updates timestamp on a dict data
+    '''updates timestamp on a dict data'''
 
     if "last updated" not in data:
         data.update({"last updated":""})
@@ -77,10 +89,10 @@ def update_time(data):
     return data
 
 def link_ids(datafile, ids):
-    # takes a list of ids from dict datafile and links them
+    '''takes a list of ids from dict datafile and links them'''
     if len(ids) < 2:
         return
-    
+
     for x in ids:
         for y in ids:
             if x != y:
@@ -89,7 +101,7 @@ def link_ids(datafile, ids):
     return ids
 
 def link_together(datafile, source, target):
-    # adds target id to source link list
+    '''adds target id to source link list'''
 
     item = get_by_id(datafile, source)[source]
     links = item.get("links")
